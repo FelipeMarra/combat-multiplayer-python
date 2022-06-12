@@ -17,6 +17,12 @@ WHITE = (255, 255, 255)
 TEST_TANK_SHEET = "tank_01_grey.png"
 TEST_MAP_SHEET = "tank_01_grey.png"
 START_LOGO = "atari_combat_logo.png"
+TANK_WALLPAPER = "tankwallpaper.png"
+
+#Audios
+AOT_OPENING = 'aotopening.mp3'
+MOSCOU_DEFENDER = 'moscoudefender.mp3'
+BEEP_SOUND = 'beep.ogg'
 
 #TEXT
 TEXT_FONT = "arial"
