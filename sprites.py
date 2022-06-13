@@ -1,28 +1,39 @@
 from constants import *
 import pygame as pg
+import os
+import math
 vec = pg.math.Vector2
+
 
 class Player(pg.sprite.Sprite):
     def __init__(self):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.Surface((30, 40))
-        self.image.fill(YELLOW)
+        self.images_directory = os.path.join(os.getcwd(), "midia/images")
+        self.audios_directory = os.path.join(os.getcwd(), "midia/audios")
+        self.image = pg.image.load(os.path.join(self.images_directory, TANK_BLUE)).convert_alpha()
+        self.image = pg.transform.scale(self.image, (50, 50))
+        self.image = pg.transform.rotate(self.image, 90)
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
         self.pos = vec(WIDTH / 2, HEIGHT / 2)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
+        self.rot = 0
 
     def update(self):
+        mouse_position = pg.mouse.get_pos()
+        angle = math.atan2(mouse_position[1] - self.rect.center[1], mouse_position[0] - self.rect.center[0])
+        playerrot = pg.transform.rotate()
+
         self.acc = vec(0, 0)
         keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT]:
+        if keys[pg.K_LEFT] or keys[pg.K_a]:
             self.acc.x = -PLAYER_ACC
-        if keys[pg.K_RIGHT]:
+        if keys[pg.K_RIGHT] or keys[pg.K_d]:
             self.acc.x = PLAYER_ACC
-        if keys[pg.K_UP]:
+        if keys[pg.K_UP] or keys[pg.K_w]:
             self.acc.y = -PLAYER_ACC
-        if keys[pg.K_DOWN]:
+        if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.acc.y = PLAYER_ACC
 
         # apply friction

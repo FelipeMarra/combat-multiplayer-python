@@ -18,6 +18,7 @@ BLUE = (0, 0, 255)
 
 #Images
 TEST_TANK_SHEET = "tank_01_grey.png"
+TANK_BLUE = "tank_blue.png"
 TEST_MAP_SHEET = "tank_01_grey.png"
 START_LOGO = "atari_combat_logo.png"
 TANK_WALLPAPER = "tankwallpaper.png"

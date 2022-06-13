@@ -27,10 +27,11 @@ class Game:
         # game loop
         self.playing = True
         while self.playing:
-            self.timer.tick(FPS)
+            self.dt = self.timer.tick(FPS) / 1000.0
             self.events()
             self.update_sprites()
             self.draw_sprites()
+            #self.moscou_song.play()
 
     def events(self):
         # defines games events
