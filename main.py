@@ -31,7 +31,7 @@ class Game:
             self.events()
             self.update_sprites()
             self.draw_sprites()
-            #self.moscou_song.play()
+            self.moscou_song.play()
 
     def events(self):
         # defines games events

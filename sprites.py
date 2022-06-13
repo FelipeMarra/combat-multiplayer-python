@@ -21,9 +21,7 @@ class Player(pg.sprite.Sprite):
         self.rot = 0
 
     def update(self):
-        mouse_position = pg.mouse.get_pos()
-        angle = math.atan2(mouse_position[1] - self.rect.center[1], mouse_position[0] - self.rect.center[0])
-        playerrot = pg.transform.rotate()
+        #
 
         self.acc = vec(0, 0)
         keys = pg.key.get_pressed()
