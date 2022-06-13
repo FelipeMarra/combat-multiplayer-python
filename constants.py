@@ -24,9 +24,9 @@ TANK_WALLPAPER = "tankwallpaper.png"
 START_BACKGROUND = "background.jpg"
 
 #Audios
-AOT_OPENING = 'aotopening.mp3'
-MOSCOU_DEFENDER = 'moscoudefender.mp3'
-BEEP_SOUND = 'beep.ogg'
+AOT_OPENING = 'aotopening.wav'
+MOSCOU_DEFENDER = 'moscoudefender.wav'
+BEEP_SOUND = 'beep.wav'
 
 #TEXT
 TEXT_FONT = "arial"
