@@ -19,8 +19,9 @@ class Game:
     def new_game(self):
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
-        self.player = Player()
-        self.all_sprites.add(self.player)s
+        self.bullets = pygame.sprite.Group()
+        self.player = Player(self)
+        self.all_sprites.add(self.player)
         self.run()
 
     def run(self):
@@ -85,6 +86,17 @@ class Game:
         self.moscou_song = pygame.mixer.Sound(os.path.join(self.audios_directory, MOSCOU_DEFENDER))
         self.moscou_song.set_volume(0.1)
         self.beep_sound = pygame.mixer.Sound(os.path.join(self.audios_directory, BEEP_SOUND))
+
+        # player
+        self.player_image = pg.image.load(os.path.join(images_directory, TANK_BLUE)).convert_alpha()
+        self.player_image = pg.transform.scale(self.player_image, (50, 50))
+        self.player_image = pg.transform.rotate(self.player_image, 90)
+
+        # bullet
+        self.bullet_img = pg.image.load(os.path.join(images_directory, BULLET)).convert_alpha()
+        self.bullet_img = pg.transform.scale(self.bullet_img, (15, 15))
+        self.bullet_sound = pg.mixer.Sound(os.path.join(self.audios_directory, BULLET_SOUND))
+        self.bullet_sound.set_volume(1.5)
 
     # displays a text on the screen
     def show_text(self, text, font_size, color, x, y):
