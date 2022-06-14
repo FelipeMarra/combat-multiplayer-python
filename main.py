@@ -8,7 +8,7 @@ class Game:
     def __init__(self):
         # Creating screem
         pygame.init()
-        pygame.mixer.init()
+        pygame.mixer.init(frequency=22050, size=-16, channels=4)
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
         self.timer = pygame.time.Clock()
@@ -19,10 +19,10 @@ class Game:
     def new_game(self):
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
-        self.bullets = pygame.sprite.Group()
         self.player = Player(self)
+        self.bullets = pygame.sprite.Group()
         self.all_sprites.add(self.player)
-        self.run()
+        self.moscou_song.play(-1)
 
     def run(self):
         # game loop
@@ -32,7 +32,7 @@ class Game:
             self.events()
             self.update_sprites()
             self.draw_sprites()
-            self.moscou_song.play()
+
 
     def events(self):
         # defines games events
@@ -88,15 +88,16 @@ class Game:
         self.beep_sound = pygame.mixer.Sound(os.path.join(self.audios_directory, BEEP_SOUND))
 
         # player
-        self.player_image = pg.image.load(os.path.join(images_directory, TANK_BLUE)).convert_alpha()
-        self.player_image = pg.transform.scale(self.player_image, (50, 50))
-        self.player_image = pg.transform.rotate(self.player_image, 90)
+        self.player_image = pygame.image.load(os.path.join(images_directory, TANK_BLUE)).convert_alpha()
+        self.player_image = pygame.transform.scale(self.player_image, (50, 50))
+        self.player_image = pygame.transform.rotate(self.player_image, 90)
+
 
         # bullet
-        self.bullet_img = pg.image.load(os.path.join(images_directory, BULLET)).convert_alpha()
-        self.bullet_img = pg.transform.scale(self.bullet_img, (15, 15))
-        self.bullet_sound = pg.mixer.Sound(os.path.join(self.audios_directory, BULLET_SOUND))
-        self.bullet_sound.set_volume(1.5)
+        self.bullet_img = pygame.image.load(os.path.join(images_directory, BULLET)).convert_alpha()
+        self.bullet_img = pygame.transform.scale(self.bullet_img, (10, 18))
+        self.bullet_img = pygame.transform.rotate(self.bullet_img, -90)
+        pg.mixer.music.load(os.path.join(self.audios_directory, BULLET_SOUND))
 
     # displays a text on the screen
     def show_text(self, text, font_size, color, x, y):
@@ -108,7 +109,7 @@ class Game:
 
     def show_start_screen(self):
 
-        self.start_song.play()
+        self.start_song.play(-1)
         font_fade = pygame.USEREVENT + 1
         show_text = True
         pygame.time.set_timer(font_fade, 900)
@@ -167,4 +168,5 @@ if __name__ == "__main__":
 
     while game.is_running:
         game.new_game()
+        game.run()
         game.show_game_over_screen()
