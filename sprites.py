@@ -123,7 +123,6 @@ class Bullet(pg.sprite.Sprite):
         if hitting == UPDOWN:
             rel_x, rel_y = self.dir_x - self.rect.centerx, self.dir_y - self.rect.centery
             angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-            print(int(angle))
             self.image = pg.transform.rotate(self.original_image, int(angle))
 
         self.rect = self.image.get_rect(center=self.pos)

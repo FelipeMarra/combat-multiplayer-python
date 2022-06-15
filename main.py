@@ -48,6 +48,12 @@ class Game:
     def draw_sprites(self):
         # cleaning screen
         self.screen.fill(BLACK)
+        self.screen.blit(self.map_background, self.map_background.get_rect())
+        #draw pointer
+        pygame.mouse.set_visible(False)
+        self.pointerImg_rect = self.pointerImg.get_rect()
+        self.pointerImg_rect.center = pygame.mouse.get_pos()
+        self.screen.blit(self.pointerImg, self.pointerImg_rect)
         # drawing sprits
         self.all_sprites.draw(self.screen)
         pygame.display.flip()
@@ -66,6 +72,15 @@ class Game:
         self.start_background = os.path.join(images_directory, START_BACKGROUND)
         self.start_background = pygame.image.load(self.start_background).convert()
         self.start_background = pygame.transform.scale(self.start_background, (WIDTH, HEIGHT))
+        #map
+        self.map_background = os.path.join(images_directory, MAPBACKGROUND)
+        self.map_background = pygame.image.load(self.map_background).convert_alpha()
+        self.map_background = pygame.transform.smoothscale(self.map_background, (WIDTH, HEIGHT))
+
+        #pointer
+        self.pointerImg = os.path.join(images_directory, POINTER)
+        self.pointerImg = pygame.image.load(self.pointerImg).convert_alpha()
+        self.pointerImg = pygame.transform.scale(self.pointerImg, (50, 50))
 
         # tanks start screen
         self.tank_wallpaper1 = os.path.join(images_directory, TANK_WALLPAPER)

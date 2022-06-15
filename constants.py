@@ -22,6 +22,8 @@ TEST_MAP_SHEET = "tank_01_grey.png"
 START_LOGO = "atari_combat_logo.png"
 TANK_WALLPAPER = "tankwallpaper.png"
 START_BACKGROUND = "background.jpg"
+MAPBACKGROUND = "mapbackground.png"
+POINTER = "pointer_image.png"
 
 #Audios
 AOT_OPENING = 'aotopening.wav'
@@ -42,7 +44,7 @@ BLUEBULLET = "bluebullet.png"
 REDBULLET = "redbullet.png"
 BULLET_SOUND = "cannon_fire.wav"
 BULLET_SPEED = 20
-BULLET_LIFETIME = 12000
+BULLET_LIFETIME = 6000
 BULLET_RATE = 1000
 LATERAL = "hitting_lateral"
 UPDOWN = "hitting_updown"
