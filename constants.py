@@ -38,8 +38,15 @@ PLAYER_ACC = 0.5
 PLAYER_FRICTION = -0.2
 
 #Bullet Settings
-BULLET = "bulletBlue1_outline.png"
+BLUEBULLET = "bluebullet.png"
+REDBULLET = "redbullet.png"
 BULLET_SOUND = "cannon_fire.wav"
 BULLET_SPEED = 20
-BULLET_LIFETIME = 7000
+BULLET_LIFETIME = 12000
 BULLET_RATE = 1000
+LATERAL = "hitting_lateral"
+UPDOWN = "hitting_updown"
+
+#Types
+ALLIE = "allie"
+ENEMY = "enemy"

@@ -19,7 +19,7 @@ class Game:
     def new_game(self):
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
-        self.player = Player(self)
+        self.player = Player(self, ALLIE)
         self.bullets = pygame.sprite.Group()
         self.all_sprites.add(self.player)
         self.moscou_song.play(-1)
@@ -94,9 +94,10 @@ class Game:
 
 
         # bullet
-        self.bullet_img = pygame.image.load(os.path.join(images_directory, BULLET)).convert_alpha()
-        self.bullet_img = pygame.transform.scale(self.bullet_img, (10, 18))
-        self.bullet_img = pygame.transform.rotate(self.bullet_img, -90)
+        self.blue_bullet = pygame.image.load(os.path.join(images_directory, BLUEBULLET)).convert_alpha()
+        self.blue_bullet = pygame.transform.scale(self.blue_bullet, (25, 25))
+        self.red_bullet = pygame.image.load(os.path.join(images_directory, REDBULLET)).convert_alpha()
+        self.red_bullet = pygame.transform.scale(self.red_bullet, (25, 25))
         pg.mixer.music.load(os.path.join(self.audios_directory, BULLET_SOUND))
 
     # displays a text on the screen
