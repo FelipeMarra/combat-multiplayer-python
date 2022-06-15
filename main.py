@@ -19,8 +19,10 @@ class Game:
     def new_game(self):
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
-        self.player = Player(self, ALLIE)
-        self.bullets = pygame.sprite.Group()
+        self.player = Player(self, ALLIE, (WIDTH/2, HEIGHT/2))
+        self.alliebullets = pygame.sprite.Group()
+        self.enemybullets = pygame.sprite.Group()
+        self.allbullets = pygame.sprite.Group()
         self.all_sprites.add(self.player)
         self.moscou_song.play(-1)
 
@@ -48,6 +50,12 @@ class Game:
     def draw_sprites(self):
         # cleaning screen
         self.screen.fill(BLACK)
+        self.screen.blit(self.map_background, self.map_background.get_rect())
+        #draw pointer
+        pygame.mouse.set_visible(False)
+        self.pointerImg_rect = self.pointerImg.get_rect()
+        self.pointerImg_rect.center = pygame.mouse.get_pos()
+        self.screen.blit(self.pointerImg, self.pointerImg_rect)
         # drawing sprits
         self.all_sprites.draw(self.screen)
         pygame.display.flip()
@@ -66,6 +74,15 @@ class Game:
         self.start_background = os.path.join(images_directory, START_BACKGROUND)
         self.start_background = pygame.image.load(self.start_background).convert()
         self.start_background = pygame.transform.scale(self.start_background, (WIDTH, HEIGHT))
+        #map
+        self.map_background = os.path.join(images_directory, MAPBACKGROUND)
+        self.map_background = pygame.image.load(self.map_background).convert_alpha()
+        self.map_background = pygame.transform.smoothscale(self.map_background, (WIDTH, HEIGHT))
+
+        #pointer
+        self.pointerImg = os.path.join(images_directory, POINTER)
+        self.pointerImg = pygame.image.load(self.pointerImg).convert_alpha()
+        self.pointerImg = pygame.transform.scale(self.pointerImg, (50, 50))
 
         # tanks start screen
         self.tank_wallpaper1 = os.path.join(images_directory, TANK_WALLPAPER)
@@ -92,13 +109,18 @@ class Game:
         self.player_image = pygame.transform.scale(self.player_image, (50, 50))
         self.player_image = pygame.transform.rotate(self.player_image, 90)
 
+        # enemy
+        self.enemy_image = pygame.image.load(os.path.join(images_directory, TANK_RED)).convert_alpha()
+        self.enemy_image = pygame.transform.scale(self.enemy_image, (50, 50))
+        self.enemy_image = pygame.transform.rotate(self.enemy_image, 90)
 
         # bullet
         self.blue_bullet = pygame.image.load(os.path.join(images_directory, BLUEBULLET)).convert_alpha()
         self.blue_bullet = pygame.transform.scale(self.blue_bullet, (25, 25))
         self.red_bullet = pygame.image.load(os.path.join(images_directory, REDBULLET)).convert_alpha()
         self.red_bullet = pygame.transform.scale(self.red_bullet, (25, 25))
-        pg.mixer.music.load(os.path.join(self.audios_directory, BULLET_SOUND))
+        self.bullet_song = pg.mixer.Sound(os.path.join(self.audios_directory, BULLET_SOUND))
+        self.bullet_song.set_volume(0.5)
 
     # displays a text on the screen
     def show_text(self, text, font_size, color, x, y):

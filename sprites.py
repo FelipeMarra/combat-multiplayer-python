@@ -2,45 +2,47 @@ from constants import *
 import pygame as pg
 import os
 import math
+
 vec = pg.math.Vector2
 
+
 class Player(pg.sprite.Sprite):
-    def __init__(self, game, tank_type):
+    def __init__(self, game, tank_type, position):
         pg.sprite.Sprite.__init__(self)
         self.game = game
-        self.image = self.game.player_image
+        if tank_type == ALLIE:
+            self.image = self.game.player_image
+        if tank_type == ENEMY:
+            self.image = self.game.player_image
         self.original_image = self.image
         self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.pos = vec(WIDTH / 2, HEIGHT / 2)
+        self.rect.center = position
+        self.pos = vec(position)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.rot = 0
         self.last_shot = -BULLET_RATE
-        self.chanel = pg.mixer.find_channel()
+        self.channel = pg.mixer.find_channel()
         self.type = tank_type
 
-    def rotate(self, hitting = False):
+    def rotate(self, hitting=False):
         mouse_x, mouse_y = pg.mouse.get_pos()
         rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
         angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-        if not hitting:
-            self.image = pg.transform.rotate(self.original_image, int(angle))
-        if hitting:
-            self.image = pg.transform.rotate(self.original_image, int(-angle))
+        self.image = pg.transform.rotate(self.original_image, int(angle))
         self.rect = self.image.get_rect(center=self.pos)
 
     def get_mouse_vector(self):
         mouse_x, mouse_y = pg.mouse.get_pos()
         rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
         angle = math.atan2(rel_y, rel_x)
-        dx = math.cos(angle)*BULLET_SPEED
-        dy = math.sin(angle)*BULLET_SPEED
+        dx = math.cos(angle) * BULLET_SPEED
+        dy = math.sin(angle) * BULLET_SPEED
         return dx, dy
 
     def play_sound(self, song):
-        self.chanel.get_queue()
-        self.chanel.play(self.game.engine_run)
+        self.channel.get_queue()
+        self.channel.play(self.game.engine_run)
 
     def shoot(self):
         now = pg.time.get_ticks()
@@ -50,9 +52,10 @@ class Player(pg.sprite.Sprite):
             dir = vec(dx, dy)
             pos = self.pos + dir
             b = Bullet(self.game, pos, dir, dx, dy, self.type)
-            b.sound()
+            b.play_sound(self.game.bullet_song)
             self.game.all_sprites.add(b)
-            self.game.bullets.add(b)
+            self.game.allbullets.add(b)
+            self.game.alliebullets.add(b)
 
     def update(self):
         self.acc = vec(0, 0)
@@ -89,12 +92,12 @@ class Player(pg.sprite.Sprite):
 
 class Bullet(pg.sprite.Sprite):
     def __init__(self, game, pos, dir, dx, dy, bullet_type):
+        pg.sprite.Sprite.__init__(self)
         self.dx = dx
         self.dy = dy
         self.dir_x, self.dir_y = pg.mouse.get_pos()
         self.dir = dir
         self.type = bullet_type
-        pg.sprite.Sprite.__init__(self)
         self.game = game
         if self.type == ALLIE:
             self.image = self.game.blue_bullet
@@ -107,31 +110,26 @@ class Bullet(pg.sprite.Sprite):
         self.vel = self.dir * BULLET_SPEED
         self.spawn_time = pg.time.get_ticks()
         self.rotate()
-        self.hitlateral = False
-        self.hitupdown = False
+        self.channel = pg.mixer.find_channel()
 
     def rotate(self, hitting=False):
-        if not hitting:
-            mouse_x, mouse_y = pg.mouse.get_pos()
-            rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
-            angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-            self.image = pg.transform.rotate(self.original_image, int(angle))
-        if hitting == LATERAL:
-            rel_x, rel_y = self.dir_x - self.rect.centerx, self.dir_y - self.rect.centery
-            angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-            self.image = pg.transform.rotate(self.original_image, int(-angle))
-        if hitting == UPDOWN:
-            rel_x, rel_y = self.dir_x - self.rect.centerx, self.dir_y - self.rect.centery
-            angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-            print(int(angle))
-            self.image = pg.transform.rotate(self.original_image, int(angle))
-
+        mouse_x, mouse_y = pg.mouse.get_pos()
+        rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
+        angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        self.image = pg.transform.rotate(self.original_image, int(angle))
         self.rect = self.image.get_rect(center=self.pos)
 
-    def sound(self):
-        pg.mixer.music.set_volume(0.5)
-        pg.mixer.music.play()
-        pg.mixer.music.fadeout(800)
+    def play_sound(self, song):
+        self.channel.get_queue()
+        self.channel.play(song)
+
+    def bounce(self, direction):
+        if direction == LATERAL:
+            self.dx = -self.dx
+        elif direction == UPDOWN:
+            self.dy = -self.dy
+        self.dir = vec(self.dx, self.dy)
+        self.vel = self.dir * BULLET_SPEED
 
     def update(self):
         self.pos += self.vel * self.game.dt
@@ -140,38 +138,10 @@ class Bullet(pg.sprite.Sprite):
             self.kill()
 
         # hit the wall and go the other way
-        statement1 = self.pos.x > WIDTH or self.pos.x < 0
-        statement2 = self.pos.y < 0 or self.pos.y > HEIGHT
-        if statement1:
-            #hit the lateral of the screen
-            self.hitlateral = not self.hitlateral
+        if self.pos.x > WIDTH or self.pos.x < 0:
+            # hit the lateral of the screen
+            self.bounce(LATERAL)
 
-            if self.hitlateral and not self.hitupdown:
-                self.dir = vec(-self.dx, self.dy)
-            if self.hitlateral and self.hitupdown:
-                self.dir = vec(-self.dx, -self.dy)
-            if not self.hitlateral and not self.hitupdown:
-                self.dir = vec(self.dx, self.dy)
-            if not self.hitlateral and self.hitupdown:
-                self.dir = vec(self.dx, -self.dy)
-
-            self.vel = self.dir * BULLET_SPEED
-            self.rotate(hitting=LATERAL)
-
-        if statement2:
-            #hit up or down in the screen
-            self.hitupdown = not self.hitupdown
-
-            if self.hitupdown and not self.hitlateral:
-                self.dir = vec(self.dx, -self.dy)
-            if self.hitupdown and self.hitlateral:
-                self.dir = vec(-self.dx, -self.dy)
-            if not self.hitupdown and not self.hitlateral:
-                self.dir = vec(self.dx, self.dy)
-            if not self.hitupdown and self.hitlateral:
-                self.dir = vec(-self.dx, self.dy)
-
-
-            self.vel = self.dir * BULLET_SPEED
-            self.rotate(hitting=UPDOWN)
-
+        if self.pos.y < 0 or self.pos.y > HEIGHT:
+            # hit up or down in the screen
+            self.bounce(UPDOWN)
