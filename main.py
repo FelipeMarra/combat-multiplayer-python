@@ -8,7 +8,7 @@ class Game:
     def __init__(self):
         # Creating screem
         pygame.init()
-        pygame.mixer.init()
+        pygame.mixer.init(frequency=22050, size=-16, channels=4)
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
         self.timer = pygame.time.Clock()
@@ -19,9 +19,12 @@ class Game:
     def new_game(self):
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
-        self.player = Player()
+        self.player = Player(self, ALLIE, (WIDTH/2, HEIGHT/2))
+        self.alliebullets = pygame.sprite.Group()
+        self.enemybullets = pygame.sprite.Group()
+        self.allbullets = pygame.sprite.Group()
         self.all_sprites.add(self.player)
-        self.run()
+        self.moscou_song.play(-1)
 
     def run(self):
         # game loop
@@ -31,7 +34,7 @@ class Game:
             self.events()
             self.update_sprites()
             self.draw_sprites()
-            self.moscou_song.play()
+
 
     def events(self):
         # defines games events
@@ -47,6 +50,12 @@ class Game:
     def draw_sprites(self):
         # cleaning screen
         self.screen.fill(BLACK)
+        self.screen.blit(self.map_background, self.map_background.get_rect())
+        #draw pointer
+        pygame.mouse.set_visible(False)
+        self.pointerImg_rect = self.pointerImg.get_rect()
+        self.pointerImg_rect.center = pygame.mouse.get_pos()
+        self.screen.blit(self.pointerImg, self.pointerImg_rect)
         # drawing sprits
         self.all_sprites.draw(self.screen)
         pygame.display.flip()
@@ -65,6 +74,15 @@ class Game:
         self.start_background = os.path.join(images_directory, START_BACKGROUND)
         self.start_background = pygame.image.load(self.start_background).convert()
         self.start_background = pygame.transform.scale(self.start_background, (WIDTH, HEIGHT))
+        #map
+        self.map_background = os.path.join(images_directory, MAPBACKGROUND)
+        self.map_background = pygame.image.load(self.map_background).convert_alpha()
+        self.map_background = pygame.transform.smoothscale(self.map_background, (WIDTH, HEIGHT))
+
+        #pointer
+        self.pointerImg = os.path.join(images_directory, POINTER)
+        self.pointerImg = pygame.image.load(self.pointerImg).convert_alpha()
+        self.pointerImg = pygame.transform.scale(self.pointerImg, (50, 50))
 
         # tanks start screen
         self.tank_wallpaper1 = os.path.join(images_directory, TANK_WALLPAPER)
@@ -86,6 +104,24 @@ class Game:
         self.moscou_song.set_volume(0.1)
         self.beep_sound = pygame.mixer.Sound(os.path.join(self.audios_directory, BEEP_SOUND))
 
+        # player
+        self.player_image = pygame.image.load(os.path.join(images_directory, TANK_BLUE)).convert_alpha()
+        self.player_image = pygame.transform.scale(self.player_image, (50, 50))
+        self.player_image = pygame.transform.rotate(self.player_image, 90)
+
+        # enemy
+        self.enemy_image = pygame.image.load(os.path.join(images_directory, TANK_RED)).convert_alpha()
+        self.enemy_image = pygame.transform.scale(self.enemy_image, (50, 50))
+        self.enemy_image = pygame.transform.rotate(self.enemy_image, 90)
+
+        # bullet
+        self.blue_bullet = pygame.image.load(os.path.join(images_directory, BLUEBULLET)).convert_alpha()
+        self.blue_bullet = pygame.transform.scale(self.blue_bullet, (25, 25))
+        self.red_bullet = pygame.image.load(os.path.join(images_directory, REDBULLET)).convert_alpha()
+        self.red_bullet = pygame.transform.scale(self.red_bullet, (25, 25))
+        self.bullet_song = pg.mixer.Sound(os.path.join(self.audios_directory, BULLET_SOUND))
+        self.bullet_song.set_volume(0.5)
+
     # displays a text on the screen
     def show_text(self, text, font_size, color, x, y):
         font = pygame.font.Font(self.font, font_size)
@@ -96,7 +132,7 @@ class Game:
 
     def show_start_screen(self):
 
-        self.start_song.play()
+        self.start_song.play(-1)
         font_fade = pygame.USEREVENT + 1
         show_text = True
         pygame.time.set_timer(font_fade, 900)
@@ -155,4 +191,5 @@ if __name__ == "__main__":
 
     while game.is_running:
         game.new_game()
+        game.run()
         game.show_game_over_screen()

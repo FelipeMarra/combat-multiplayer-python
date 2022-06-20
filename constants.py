@@ -18,11 +18,12 @@ BLUE = (0, 0, 255)
 
 #Images
 TEST_TANK_SHEET = "tank_01_grey.png"
-TANK_BLUE = "tank_blue.png"
 TEST_MAP_SHEET = "tank_01_grey.png"
 START_LOGO = "atari_combat_logo.png"
 TANK_WALLPAPER = "tankwallpaper.png"
 START_BACKGROUND = "background.jpg"
+MAPBACKGROUND = "mapbackground.png"
+POINTER = "pointer_image.png"
 
 #Audios
 AOT_OPENING = 'aotopening.wav'
@@ -33,5 +34,21 @@ BEEP_SOUND = 'beep.wav'
 TEXT_FONT = "arial"
 
 #Player Settings
-PLAYER_ACC = 1
+TANK_BLUE = "tank_blue.png"
+TANK_RED = "tank_red.png"
+PLAYER_ACC = 0.5
 PLAYER_FRICTION = -0.2
+
+#Bullet Settings
+BLUEBULLET = "bluebullet.png"
+REDBULLET = "redbullet.png"
+BULLET_SOUND = "cannon_fire.wav"
+BULLET_SPEED = 20
+BULLET_LIFETIME = 6000
+BULLET_RATE = 1000
+LATERAL = "hitting_lateral"
+UPDOWN = "hitting_updown"
+
+#Types
+ALLIE = "allie"
+ENEMY = "enemy"

@@ -2,27 +2,62 @@ from constants import *
 import pygame as pg
 import os
 import math
+
 vec = pg.math.Vector2
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, game, tank_type, position):
         pg.sprite.Sprite.__init__(self)
-        self.images_directory = os.path.join(os.getcwd(), "midia/images")
-        self.audios_directory = os.path.join(os.getcwd(), "midia/audios")
-        self.image = pg.image.load(os.path.join(self.images_directory, TANK_BLUE)).convert_alpha()
-        self.image = pg.transform.scale(self.image, (50, 50))
-        self.image = pg.transform.rotate(self.image, 90)
+        self.game = game
+        if tank_type == ALLIE:
+            self.image = self.game.player_image
+        if tank_type == ENEMY:
+            self.image = self.game.player_image
+        self.original_image = self.image
         self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.pos = vec(WIDTH / 2, HEIGHT / 2)
+        self.rect.center = position
+        self.pos = vec(position)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.rot = 0
+        self.last_shot = -BULLET_RATE
+        self.channel = pg.mixer.find_channel()
+        self.type = tank_type
+
+    def rotate(self, hitting=False):
+        mouse_x, mouse_y = pg.mouse.get_pos()
+        rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
+        angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        self.image = pg.transform.rotate(self.original_image, int(angle))
+        self.rect = self.image.get_rect(center=self.pos)
+
+    def get_mouse_vector(self):
+        mouse_x, mouse_y = pg.mouse.get_pos()
+        rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
+        angle = math.atan2(rel_y, rel_x)
+        dx = math.cos(angle) * BULLET_SPEED
+        dy = math.sin(angle) * BULLET_SPEED
+        return dx, dy
+
+    def play_sound(self, song):
+        self.channel.get_queue()
+        self.channel.play(self.game.engine_run)
+
+    def shoot(self):
+        now = pg.time.get_ticks()
+        if now - self.last_shot > BULLET_RATE:
+            self.last_shot = now
+            dx, dy = self.get_mouse_vector()
+            dir = vec(dx, dy)
+            pos = self.pos + dir
+            b = Bullet(self.game, pos, dir, dx, dy, self.type)
+            b.play_sound(self.game.bullet_song)
+            self.game.all_sprites.add(b)
+            self.game.allbullets.add(b)
+            self.game.alliebullets.add(b)
 
     def update(self):
-        #
-
         self.acc = vec(0, 0)
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]:
@@ -33,6 +68,8 @@ class Player(pg.sprite.Sprite):
             self.acc.y = -PLAYER_ACC
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.acc.y = PLAYER_ACC
+        if pg.mouse.get_pressed()[0]:
+            self.shoot()
 
         # apply friction
         self.acc += self.vel * PLAYER_FRICTION
@@ -50,3 +87,61 @@ class Player(pg.sprite.Sprite):
             self.pos.y = HEIGHT
 
         self.rect.center = self.pos
+        self.rotate()
+
+
+class Bullet(pg.sprite.Sprite):
+    def __init__(self, game, pos, dir, dx, dy, bullet_type):
+        pg.sprite.Sprite.__init__(self)
+        self.dx = dx
+        self.dy = dy
+        self.dir_x, self.dir_y = pg.mouse.get_pos()
+        self.dir = dir
+        self.type = bullet_type
+        self.game = game
+        if self.type == ALLIE:
+            self.image = self.game.blue_bullet
+        if self.type == ENEMY:
+            self.image = self.game.red_bullet
+        self.original_image = self.image
+        self.rect = self.image.get_rect()
+        self.pos = vec(pos)
+        self.rect.center = pos
+        self.vel = self.dir * BULLET_SPEED
+        self.spawn_time = pg.time.get_ticks()
+        self.rotate()
+        self.channel = pg.mixer.find_channel()
+
+    def rotate(self, hitting=False):
+        mouse_x, mouse_y = pg.mouse.get_pos()
+        rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
+        angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        self.image = pg.transform.rotate(self.original_image, int(angle))
+        self.rect = self.image.get_rect(center=self.pos)
+
+    def play_sound(self, song):
+        self.channel.get_queue()
+        self.channel.play(song)
+
+    def bounce(self, direction):
+        if direction == LATERAL:
+            self.dx = -self.dx
+        elif direction == UPDOWN:
+            self.dy = -self.dy
+        self.dir = vec(self.dx, self.dy)
+        self.vel = self.dir * BULLET_SPEED
+
+    def update(self):
+        self.pos += self.vel * self.game.dt
+        self.rect.center = self.pos
+        if pg.time.get_ticks() - self.spawn_time > BULLET_LIFETIME:
+            self.kill()
+
+        # hit the wall and go the other way
+        if self.pos.x > WIDTH or self.pos.x < 0:
+            # hit the lateral of the screen
+            self.bounce(LATERAL)
+
+        if self.pos.y < 0 or self.pos.y > HEIGHT:
+            # hit up or down in the screen
+            self.bounce(UPDOWN)
