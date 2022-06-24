@@ -2,6 +2,14 @@
 WIDTH = 1280
 HEIGHT = 720
 
+#positions
+PLAYER_POSITION_0 = (200, HEIGHT/2)
+PLAYER_POSITION_1 = (WIDTH-200, HEIGHT/2)
+
+#types
+PLAYER = "player"
+BULLET = "bullet"
+
 #game title
 GAME_TITLE = "Combat Multiplayer"
 
@@ -49,6 +57,3 @@ BULLET_RATE = 1000
 LATERAL = "hitting_lateral"
 UPDOWN = "hitting_updown"
 
-#Types
-ALLIE = "allie"
-ENEMY = "enemy"

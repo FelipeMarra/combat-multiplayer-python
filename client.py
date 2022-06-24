@@ -2,7 +2,8 @@ import pygame
 from constants import *
 import os
 from sprites import *
-
+from network import Network
+import sys
 
 class Game:
     def __init__(self):
@@ -15,15 +16,20 @@ class Game:
         self.is_running = True
         self.font = pygame.font.match_font(TEXT_FONT)
         self.load_files()
+        self.network = Network(server_ip, int(server_port))
 
     def new_game(self):
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
-        self.player = Player(self, ALLIE, (WIDTH/2, HEIGHT/2))
+        p_data = self.network.my_player_data
+        enemy_data = self.network.send(ServerPkt(PLAYER, p_data))
+        self.my_player = Player(self, p_data)
+        self.enemy_player = Player(self, enemy_data)
+        
         self.alliebullets = pygame.sprite.Group()
         self.enemybullets = pygame.sprite.Group()
-        self.allbullets = pygame.sprite.Group()
-        self.all_sprites.add(self.player)
+        self.all_sprites.add(self.my_player)
+        self.all_sprites.add(self.enemy_player)
         self.moscou_song.play(-1)
 
     def run(self):
@@ -186,9 +192,13 @@ class Game:
 
 
 if __name__ == "__main__":
+    file, server_ip, server_port = sys.argv
     game = Game()
     game.show_start_screen()
-
+    #TODO game.show_await_screen()
+    my_player = game.network.connect()
+    if(my_player.pid == 0):
+        game.network.await_match()
     while game.is_running:
         game.new_game()
         game.run()

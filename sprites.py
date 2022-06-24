@@ -1,5 +1,6 @@
 from constants import *
 import pygame as pg
+from player_data import *
 import os
 import math
 
@@ -7,23 +8,23 @@ vec = pg.math.Vector2
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, game, tank_type, position):
+    def __init__(self, game, data:PlayerData):
         pg.sprite.Sprite.__init__(self)
+        self.pid = data.pid
         self.game = game
-        if tank_type == ALLIE:
+        if self.pid == 0:
             self.image = self.game.player_image
-        if tank_type == ENEMY:
-            self.image = self.game.player_image
+        elif self.pid == 1:
+            self.image = self.game.enemy_image
         self.original_image = self.image
         self.rect = self.image.get_rect()
-        self.rect.center = position
-        self.pos = vec(position)
-        self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
-        self.rot = 0
+        self.rect.center = data.pos
+        self.pos = vec(data.pos)
+        self.vel = vec(data.vel)
+        self.acc = vec(data.acc)
         self.last_shot = -BULLET_RATE
         self.channel = pg.mixer.find_channel()
-        self.type = tank_type
+        
 
     def rotate(self, hitting=False):
         mouse_x, mouse_y = pg.mouse.get_pos()
@@ -31,6 +32,7 @@ class Player(pg.sprite.Sprite):
         angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
         self.image = pg.transform.rotate(self.original_image, int(angle))
         self.rect = self.image.get_rect(center=self.pos)
+        return angle
 
     def get_mouse_vector(self):
         mouse_x, mouse_y = pg.mouse.get_pos()
@@ -54,19 +56,18 @@ class Player(pg.sprite.Sprite):
             b = Bullet(self.game, pos, dir, dx, dy, self.type)
             b.play_sound(self.game.bullet_song)
             self.game.all_sprites.add(b)
-            self.game.allbullets.add(b)
             self.game.alliebullets.add(b)
 
     def update(self):
         self.acc = vec(0, 0)
         keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT] or keys[pg.K_a]:
+        if (keys[pg.K_LEFT] or keys[pg.K_a]) and self.pos.x > 25:
             self.acc.x = -PLAYER_ACC
-        if keys[pg.K_RIGHT] or keys[pg.K_d]:
+        if (keys[pg.K_RIGHT] or keys[pg.K_d]) and self.pos.x < WIDTH - 25:
             self.acc.x = PLAYER_ACC
-        if keys[pg.K_UP] or keys[pg.K_w]:
+        if( keys[pg.K_UP] or keys[pg.K_w]) and self.pos.y > 25:
             self.acc.y = -PLAYER_ACC
-        if keys[pg.K_DOWN] or keys[pg.K_s]:
+        if (keys[pg.K_DOWN] or keys[pg.K_s]) and self.pos.y < HEIGHT - 25:
             self.acc.y = PLAYER_ACC
         if pg.mouse.get_pressed()[0]:
             self.shoot()
@@ -76,6 +77,8 @@ class Player(pg.sprite.Sprite):
         # equations of motion
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
+        
+        '''
         # wrap around the sides of the screen
         if self.pos.x > WIDTH:
             self.pos.x = 0
@@ -85,9 +88,12 @@ class Player(pg.sprite.Sprite):
             self.pos.y = 0
         if self.pos.y < 0:
             self.pos.y = HEIGHT
-
+        '''
+        
         self.rect.center = self.pos
-        self.rotate()
+        angle = self.rotate()
+
+        #send update to server
 
 
 class Bullet(pg.sprite.Sprite):
@@ -99,10 +105,7 @@ class Bullet(pg.sprite.Sprite):
         self.dir = dir
         self.type = bullet_type
         self.game = game
-        if self.type == ALLIE:
-            self.image = self.game.blue_bullet
-        if self.type == ENEMY:
-            self.image = self.game.red_bullet
+        self.image = self.game.blue_bullet
         self.original_image = self.image
         self.rect = self.image.get_rect()
         self.pos = vec(pos)
@@ -145,3 +148,7 @@ class Bullet(pg.sprite.Sprite):
         if self.pos.y < 0 or self.pos.y > HEIGHT:
             # hit up or down in the screen
             self.bounce(UPDOWN)
+
+class Wall(pg.sprite.Sprite):
+    def __init__(self):
+        pg.sprite.Sprite.__init__(self)
