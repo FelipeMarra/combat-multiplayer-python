@@ -27,13 +27,17 @@ class Player(pg.sprite.Sprite):
         self.itsMe = itsMe
         
 
-    def rotate(self, hitting=False):
-        mouse_x, mouse_y = pg.mouse.get_pos()
-        rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
-        angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-        self.image = pg.transform.rotate(self.original_image, int(angle))
-        self.rect = self.image.get_rect(center=self.pos)
-        return angle
+    def rotate(self, angle = None):
+        if not angle:
+            mouse_x, mouse_y = pg.mouse.get_pos()
+            rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
+            angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+            self.image = pg.transform.rotate(self.original_image, int(angle))
+            self.rect = self.image.get_rect(center=self.pos)
+            return angle
+        if angle:
+            self.image = pg.transform.rotate(self.original_image, int(angle))
+            self.rect = self.image.get_rect(center=self.pos)
 
     def get_mouse_vector(self):
         mouse_x, mouse_y = pg.mouse.get_pos()
@@ -95,8 +99,23 @@ class Player(pg.sprite.Sprite):
             self.rect.center = self.pos
             angle = self.rotate()
 
-            #send update to server
+            self.game.network.my_player_data.pos = self.pos
+            self.game.network.my_player_data.vel = self.vel
+            self.game.network.my_player_data.acc = self.acc
+            self.game.network.my_player_data.angle = angle
 
+            #send update to server
+            server_pkt = self.game.network.send(ServerPkt(PLAYER, self.game.network.my_player_data))
+            if server_pkt.type == PLAYER:
+                enemy_data = server_pkt.data
+                self.game.network.enemy_player_data = enemy_data
+        else:
+            self.game.enemy_player.pos = self.game.network.enemy_player_data.pos
+            self.game.enemy_player.vel = self.game.network.enemy_player_data.vel
+            self.game.enemy_player.acc = self.game.network.enemy_player_data.acc
+            self.game.enemy_player.angle = self.game.network.enemy_player_data.angle
+            self.game.enemy_player.rect.center = self.game.enemy_player.pos
+            self.game.enemy_player.rotate(self.game.enemy_player.angle)
 
 class Bullet(pg.sprite.Sprite):
     def __init__(self, game, pos, dir, dx, dy, bullet_type):

@@ -22,7 +22,7 @@ class Game:
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
         p_data = self.network.my_player_data
-        enemy_data = self.network.send(ServerPkt(PLAYER, p_data))
+        enemy_data = self.network.send(ServerPkt(PLAYER, p_data)).data
         self.my_player = Player(self, p_data, True)
         self.enemy_player = Player(self, enemy_data, False)
         self.alliebullets = pygame.sprite.Group()

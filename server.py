@@ -43,7 +43,6 @@ class Server:
                 self.players_sockets.append(clientSocket)
                 
     def listen_client(self, client_socket, addr, pid):
-        print(f"CHEGOU UM CARA E A LEN DOS PLAYER EH {len(self.players_sockets)}")
         #If there's no other player pid is 0
         if(pid == 0):
             print(f"Client {addr} started a new game.")
@@ -72,7 +71,7 @@ class Server:
                         if server_pkt.type == PLAYER:
                             for player_socket in self.players_sockets:
                                 if(player_socket != client_socket):
-                                    player_socket.send(pickle.dumps(server_pkt.data))
+                                    player_socket.send(pickle.dumps(server_pkt))
             except error:
                 print(f"Erro ao ouvir cliente {addr}: {type(error)}: {error.args}")
                 break
