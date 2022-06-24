@@ -8,7 +8,7 @@ vec = pg.math.Vector2
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, game, data:PlayerData):
+    def __init__(self, game, data:PlayerData, itsMe:bool):
         pg.sprite.Sprite.__init__(self)
         self.pid = data.pid
         self.game = game
@@ -24,6 +24,7 @@ class Player(pg.sprite.Sprite):
         self.acc = vec(data.acc)
         self.last_shot = -BULLET_RATE
         self.channel = pg.mixer.find_channel()
+        self.itsMe = itsMe
         
 
     def rotate(self, hitting=False):
@@ -59,41 +60,42 @@ class Player(pg.sprite.Sprite):
             self.game.alliebullets.add(b)
 
     def update(self):
-        self.acc = vec(0, 0)
-        keys = pg.key.get_pressed()
-        if (keys[pg.K_LEFT] or keys[pg.K_a]) and self.pos.x > 25:
-            self.acc.x = -PLAYER_ACC
-        if (keys[pg.K_RIGHT] or keys[pg.K_d]) and self.pos.x < WIDTH - 25:
-            self.acc.x = PLAYER_ACC
-        if( keys[pg.K_UP] or keys[pg.K_w]) and self.pos.y > 25:
-            self.acc.y = -PLAYER_ACC
-        if (keys[pg.K_DOWN] or keys[pg.K_s]) and self.pos.y < HEIGHT - 25:
-            self.acc.y = PLAYER_ACC
-        if pg.mouse.get_pressed()[0]:
-            self.shoot()
+        if self.itsMe:
+            self.acc = vec(0, 0)
+            keys = pg.key.get_pressed()
+            if (keys[pg.K_LEFT] or keys[pg.K_a]) and self.pos.x > 25:
+                self.acc.x = -PLAYER_ACC
+            if (keys[pg.K_RIGHT] or keys[pg.K_d]) and self.pos.x < WIDTH - 25:
+                self.acc.x = PLAYER_ACC
+            if( keys[pg.K_UP] or keys[pg.K_w]) and self.pos.y > 25:
+                self.acc.y = -PLAYER_ACC
+            if (keys[pg.K_DOWN] or keys[pg.K_s]) and self.pos.y < HEIGHT - 25:
+                self.acc.y = PLAYER_ACC
+            if pg.mouse.get_pressed()[0]:
+                self.shoot()
 
-        # apply friction
-        self.acc += self.vel * PLAYER_FRICTION
-        # equations of motion
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
-        
-        '''
-        # wrap around the sides of the screen
-        if self.pos.x > WIDTH:
-            self.pos.x = 0
-        if self.pos.x < 0:
-            self.pos.x = WIDTH
-        if self.pos.y > HEIGHT:
-            self.pos.y = 0
-        if self.pos.y < 0:
-            self.pos.y = HEIGHT
-        '''
-        
-        self.rect.center = self.pos
-        angle = self.rotate()
+            # apply friction
+            self.acc += self.vel * PLAYER_FRICTION
+            # equations of motion
+            self.vel += self.acc
+            self.pos += self.vel + 0.5 * self.acc
+            
+            '''
+            # wrap around the sides of the screen
+            if self.pos.x > WIDTH:
+                self.pos.x = 0
+            if self.pos.x < 0:
+                self.pos.x = WIDTH
+            if self.pos.y > HEIGHT:
+                self.pos.y = 0
+            if self.pos.y < 0:
+                self.pos.y = HEIGHT
+            '''
+            
+            self.rect.center = self.pos
+            angle = self.rotate()
 
-        #send update to server
+            #send update to server
 
 
 class Bullet(pg.sprite.Sprite):

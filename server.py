@@ -76,7 +76,11 @@ class Server:
             except error:
                 print(f"Erro ao ouvir cliente {addr}: {type(error)}: {error.args}")
                 break
-        client_socket.close()
+        #If one player goes off, all of them must go off too
+        #TODO THIS PART IS NOT WORKING
+        for socket in self.players_sockets:
+            socket.close()
+        self.players_sockets.clear()
 
 
 if __name__ == "__main__":
