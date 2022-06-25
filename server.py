@@ -10,7 +10,7 @@ class Server:
     def __init__(self):
         self.players_sockets = []
         self.serverSocket = None
-        self.buffer = 1024
+        self.buffer = 1024*2
 
     #Create Server and return server socket
     def start(self, server_port):

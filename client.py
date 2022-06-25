@@ -4,8 +4,22 @@ import os
 from sprites import *
 from network import Network
 import sys
+import threading
 
-class Game:
+class SingletonMeta(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        """
+        Possible changes to the value of the `__init__` argument do not affect
+        the returned instance.
+        """
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+class Game(metaclass=SingletonMeta):
     def __init__(self):
         # Creating screem
         pygame.init()
@@ -22,7 +36,7 @@ class Game:
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
         p_data = self.network.my_player_data
-        enemy_data = self.network.send(ServerPkt(PLAYER, p_data)).data
+        enemy_data = self.network.start_enemy(ServerPkt(PLAYER, p_data))
         self.my_player = Player(self, p_data, True)
         self.enemy_player = Player(self, enemy_data, False)
         self.alliebullets = pygame.sprite.Group()
@@ -34,6 +48,8 @@ class Game:
     def run(self):
         # game loop
         self.playing = True
+        new_thread = threading.Thread(target=self.network.receive, args=(id(self),))
+        new_thread.start()
         while self.playing:
             self.dt = self.timer.tick(FPS) / 1000.0
             self.events()

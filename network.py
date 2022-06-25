@@ -2,13 +2,14 @@ from socket import *
 import pickle
 from player_data import *
 from constants import *
+import ctypes
 
 class Network:
     def __init__(self, ip, port):
         self.client = socket(AF_INET, SOCK_STREAM)
         self.server = ip
         self.port = port
-        self.buffer = 1024
+        self.buffer = 1024*2
         self.addr = (ip, port)
         self.my_player_data = None
         self.enemy_player_data = None
@@ -52,12 +53,42 @@ class Network:
                 self.client.close()
                 quit()
 
+    def start_enemy(self, server_pkt):
+        try:
+            self.client.send(pickle.dumps(server_pkt))
+            #In case we're sending our player update for the first time we want to get others back
+            return pickle.loads(self.client.recv(self.buffer)).data
+        except error:
+            print(f"Error sending pkt type {type(error)}")
 
     def send(self, server_pkt):
         try:
-            #sending object
             self.client.send(pickle.dumps(server_pkt))
-            #In case we're sending our player update we want to get others back
-            return pickle.loads(self.client.recv(self.buffer))
         except error:
             print(f"Error sending pkt type {type(error)}")
+
+    def receive(self, game):
+        game = ctypes.cast(game, ctypes.py_object).value
+        while True:
+            try:
+                data = self.client.recv(self.buffer)
+                if data:
+            
+                    try:
+                        server_pkt = pickle.loads(data)
+                    except:
+                        #Pickle raises exception when moving game window borders
+                        pass
+
+                    if server_pkt.type == PLAYER:
+                        enemy_data = server_pkt.data
+                        game.network.enemy_player_data = enemy_data
+                        game.enemy_player.pos = game.network.enemy_player_data.pos
+                        game.enemy_player.vel = game.network.enemy_player_data.vel
+                        game.enemy_player.acc = game.network.enemy_player_data.acc
+                        game.enemy_player.angle = game.network.enemy_player_data.angle
+                        game.enemy_player.rect.center = game.enemy_player.pos
+                        game.enemy_player.rotate(game.enemy_player.angle)
+
+            except error:
+                print(f"Error on network receive")

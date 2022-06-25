@@ -58,12 +58,14 @@ class Player(pg.sprite.Sprite):
             dx, dy = self.get_mouse_vector()
             dir = vec(dx, dy)
             pos = self.pos + dir
-            b = Bullet(self.game, pos, dir, dx, dy, self.type)
-            b.play_sound(self.game.bullet_song)
+            b = Bullet(self.game, pos, dir, dx, dy, self.pid)
+            #Send to server
+            self.game.network.send(ServerPkt(BULLET, BulletData(pos, dir, dx, dy, self.pid)))
             self.game.all_sprites.add(b)
             self.game.alliebullets.add(b)
 
     def update(self):
+        ####### position #########
         if self.itsMe:
             self.acc = vec(0, 0)
             keys = pg.key.get_pressed()
@@ -83,19 +85,7 @@ class Player(pg.sprite.Sprite):
             # equations of motion
             self.vel += self.acc
             self.pos += self.vel + 0.5 * self.acc
-            
-            '''
-            # wrap around the sides of the screen
-            if self.pos.x > WIDTH:
-                self.pos.x = 0
-            if self.pos.x < 0:
-                self.pos.x = WIDTH
-            if self.pos.y > HEIGHT:
-                self.pos.y = 0
-            if self.pos.y < 0:
-                self.pos.y = HEIGHT
-            '''
-            
+
             self.rect.center = self.pos
             angle = self.rotate()
 
@@ -105,26 +95,16 @@ class Player(pg.sprite.Sprite):
             self.game.network.my_player_data.angle = angle
 
             #send update to server
-            server_pkt = self.game.network.send(ServerPkt(PLAYER, self.game.network.my_player_data))
-            if server_pkt.type == PLAYER:
-                enemy_data = server_pkt.data
-                self.game.network.enemy_player_data = enemy_data
-        else:
-            self.game.enemy_player.pos = self.game.network.enemy_player_data.pos
-            self.game.enemy_player.vel = self.game.network.enemy_player_data.vel
-            self.game.enemy_player.acc = self.game.network.enemy_player_data.acc
-            self.game.enemy_player.angle = self.game.network.enemy_player_data.angle
-            self.game.enemy_player.rect.center = self.game.enemy_player.pos
-            self.game.enemy_player.rotate(self.game.enemy_player.angle)
+            self.game.network.send(ServerPkt(PLAYER, self.game.network.my_player_data))
 
 class Bullet(pg.sprite.Sprite):
-    def __init__(self, game, pos, dir, dx, dy, bullet_type):
+    def __init__(self, game, pos, dir, dx, dy, pid):
         pg.sprite.Sprite.__init__(self)
         self.dx = dx
         self.dy = dy
         self.dir_x, self.dir_y = pg.mouse.get_pos()
         self.dir = dir
-        self.type = bullet_type
+        self.pid = pid
         self.game = game
         self.image = self.game.blue_bullet
         self.original_image = self.image
@@ -135,6 +115,7 @@ class Bullet(pg.sprite.Sprite):
         self.spawn_time = pg.time.get_ticks()
         self.rotate()
         self.channel = pg.mixer.find_channel()
+        self.play_sound(self.game.bullet_song)
 
     def rotate(self, hitting=False):
         mouse_x, mouse_y = pg.mouse.get_pos()
