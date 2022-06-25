@@ -58,11 +58,9 @@ class Player(pg.sprite.Sprite):
             dx, dy = self.get_mouse_vector()
             dir = vec(dx, dy)
             pos = self.pos + dir
-            b = Bullet(self.game, pos, dir, dx, dy, self.pid)
             #Send to server
             self.game.network.send(ServerPkt(BULLET, BulletData(pos, dir, dx, dy, self.pid)))
-            self.game.all_sprites.add(b)
-            self.game.alliebullets.add(b)
+
 
     def update(self):
         ####### position #########
@@ -106,7 +104,10 @@ class Bullet(pg.sprite.Sprite):
         self.dir = dir
         self.pid = pid
         self.game = game
-        self.image = self.game.blue_bullet
+        if self.pid == 0:
+            self.image = self.game.blue_bullet
+        if self.pid == 1:
+            self.image = self.game.red_bullet
         self.original_image = self.image
         self.rect = self.image.get_rect()
         self.pos = vec(pos)

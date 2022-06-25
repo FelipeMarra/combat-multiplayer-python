@@ -72,6 +72,11 @@ class Server:
                             for player_socket in self.players_sockets:
                                 if(player_socket != client_socket):
                                     player_socket.send(pickle.dumps(server_pkt))
+                        if server_pkt.type == BULLET:
+                            for player_socket in self.players_sockets:
+                                player_socket.send(pickle.dumps(server_pkt))
+
+                        
             except error:
                 print(f"Erro ao ouvir cliente {addr}: {type(error)}: {error.args}")
                 break

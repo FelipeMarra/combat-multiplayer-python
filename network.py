@@ -3,6 +3,7 @@ import pickle
 from player_data import *
 from constants import *
 import ctypes
+from sprites import *
 
 class Network:
     def __init__(self, ip, port):
@@ -89,6 +90,18 @@ class Network:
                         game.enemy_player.angle = game.network.enemy_player_data.angle
                         game.enemy_player.rect.center = game.enemy_player.pos
                         game.enemy_player.rotate(game.enemy_player.angle)
+                    
+                    if server_pkt.type == BULLET:
+                        #self.game.network.send(ServerPkt(BULLET, BulletData(pos, dir, dx, dy, self.pid)))
+                        bullet_data = server_pkt.data
+                        b = Bullet(game, bullet_data.pos, bullet_data.dir, bullet_data.dx, bullet_data.dy, bullet_data.pid)
+                        
+                        if bullet_data.pid == game.my_player.pid:
+                            game.alliebullets.add(b)
+                        else:
+                            game.enemybullets.add(b)
+                        
+                        game.all_sprites.add(b)
 
             except error:
                 print(f"Error on network receive")
