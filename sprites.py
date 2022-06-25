@@ -1,5 +1,6 @@
 from constants import *
 import pygame as pg
+from player_data import *
 import os
 import math
 
@@ -7,30 +8,36 @@ vec = pg.math.Vector2
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, game, tank_type, position):
+    def __init__(self, game, data:PlayerData, itsMe:bool):
         pg.sprite.Sprite.__init__(self)
+        self.pid = data.pid
         self.game = game
-        if tank_type == ALLIE:
+        if self.pid == 0:
             self.image = self.game.player_image
-        if tank_type == ENEMY:
-            self.image = self.game.player_image
+        elif self.pid == 1:
+            self.image = self.game.enemy_image
         self.original_image = self.image
         self.rect = self.image.get_rect()
-        self.rect.center = position
-        self.pos = vec(position)
-        self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
-        self.rot = 0
+        self.rect.center = data.pos
+        self.pos = vec(data.pos)
+        self.vel = vec(data.vel)
+        self.acc = vec(data.acc)
         self.last_shot = -BULLET_RATE
         self.channel = pg.mixer.find_channel()
-        self.type = tank_type
+        self.itsMe = itsMe
+        
 
-    def rotate(self, hitting=False):
-        mouse_x, mouse_y = pg.mouse.get_pos()
-        rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
-        angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-        self.image = pg.transform.rotate(self.original_image, int(angle))
-        self.rect = self.image.get_rect(center=self.pos)
+    def rotate(self, angle = None):
+        if not angle:
+            mouse_x, mouse_y = pg.mouse.get_pos()
+            rel_x, rel_y = mouse_x - self.rect.centerx, mouse_y - self.rect.centery
+            angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+            self.image = pg.transform.rotate(self.original_image, int(angle))
+            self.rect = self.image.get_rect(center=self.pos)
+            return angle
+        if angle:
+            self.image = pg.transform.rotate(self.original_image, int(angle))
+            self.rect = self.image.get_rect(center=self.pos)
 
     def get_mouse_vector(self):
         mouse_x, mouse_y = pg.mouse.get_pos()
@@ -51,57 +58,55 @@ class Player(pg.sprite.Sprite):
             dx, dy = self.get_mouse_vector()
             dir = vec(dx, dy)
             pos = self.pos + dir
-            b = Bullet(self.game, pos, dir, dx, dy, self.type)
-            b.play_sound(self.game.bullet_song)
-            self.game.all_sprites.add(b)
-            self.game.allbullets.add(b)
-            self.game.alliebullets.add(b)
+            #Send to server
+            self.game.network.send(ServerPkt(BULLET, BulletData(pos, dir, dx, dy, self.pid)))
+
 
     def update(self):
-        self.acc = vec(0, 0)
-        keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT] or keys[pg.K_a]:
-            self.acc.x = -PLAYER_ACC
-        if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            self.acc.x = PLAYER_ACC
-        if keys[pg.K_UP] or keys[pg.K_w]:
-            self.acc.y = -PLAYER_ACC
-        if keys[pg.K_DOWN] or keys[pg.K_s]:
-            self.acc.y = PLAYER_ACC
-        if pg.mouse.get_pressed()[0]:
-            self.shoot()
+        ####### position #########
+        if self.itsMe:
+            self.acc = vec(0, 0)
+            keys = pg.key.get_pressed()
+            if (keys[pg.K_LEFT] or keys[pg.K_a]) and self.pos.x > 25:
+                self.acc.x = -PLAYER_ACC
+            if (keys[pg.K_RIGHT] or keys[pg.K_d]) and self.pos.x < WIDTH - 25:
+                self.acc.x = PLAYER_ACC
+            if( keys[pg.K_UP] or keys[pg.K_w]) and self.pos.y > 25:
+                self.acc.y = -PLAYER_ACC
+            if (keys[pg.K_DOWN] or keys[pg.K_s]) and self.pos.y < HEIGHT - 25:
+                self.acc.y = PLAYER_ACC
+            if pg.mouse.get_pressed()[0]:
+                self.shoot()
 
-        # apply friction
-        self.acc += self.vel * PLAYER_FRICTION
-        # equations of motion
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
-        # wrap around the sides of the screen
-        if self.pos.x > WIDTH:
-            self.pos.x = 0
-        if self.pos.x < 0:
-            self.pos.x = WIDTH
-        if self.pos.y > HEIGHT:
-            self.pos.y = 0
-        if self.pos.y < 0:
-            self.pos.y = HEIGHT
+            # apply friction
+            self.acc += self.vel * PLAYER_FRICTION
+            # equations of motion
+            self.vel += self.acc
+            self.pos += self.vel + 0.5 * self.acc
 
-        self.rect.center = self.pos
-        self.rotate()
+            self.rect.center = self.pos
+            angle = self.rotate()
 
+            self.game.network.my_player_data.pos = self.pos
+            self.game.network.my_player_data.vel = self.vel
+            self.game.network.my_player_data.acc = self.acc
+            self.game.network.my_player_data.angle = angle
+
+            #send update to server
+            self.game.network.send(ServerPkt(PLAYER, self.game.network.my_player_data))
 
 class Bullet(pg.sprite.Sprite):
-    def __init__(self, game, pos, dir, dx, dy, bullet_type):
+    def __init__(self, game, pos, dir, dx, dy, pid):
         pg.sprite.Sprite.__init__(self)
         self.dx = dx
         self.dy = dy
         self.dir_x, self.dir_y = pg.mouse.get_pos()
         self.dir = dir
-        self.type = bullet_type
+        self.pid = pid
         self.game = game
-        if self.type == ALLIE:
+        if self.pid == 0:
             self.image = self.game.blue_bullet
-        if self.type == ENEMY:
+        if self.pid == 1:
             self.image = self.game.red_bullet
         self.original_image = self.image
         self.rect = self.image.get_rect()
@@ -111,6 +116,7 @@ class Bullet(pg.sprite.Sprite):
         self.spawn_time = pg.time.get_ticks()
         self.rotate()
         self.channel = pg.mixer.find_channel()
+        self.play_sound(self.game.bullet_song)
 
     def rotate(self, hitting=False):
         mouse_x, mouse_y = pg.mouse.get_pos()
@@ -145,3 +151,7 @@ class Bullet(pg.sprite.Sprite):
         if self.pos.y < 0 or self.pos.y > HEIGHT:
             # hit up or down in the screen
             self.bounce(UPDOWN)
+
+class Wall(pg.sprite.Sprite):
+    def __init__(self):
+        pg.sprite.Sprite.__init__(self)

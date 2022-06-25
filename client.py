@@ -2,9 +2,24 @@ import pygame
 from constants import *
 import os
 from sprites import *
+from network import Network
+import sys
+import threading
 
+class SingletonMeta(type):
+    _instances = {}
 
-class Game:
+    def __call__(cls, *args, **kwargs):
+        """
+        Possible changes to the value of the `__init__` argument do not affect
+        the returned instance.
+        """
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+class Game(metaclass=SingletonMeta):
     def __init__(self):
         # Creating screem
         pygame.init()
@@ -15,20 +30,26 @@ class Game:
         self.is_running = True
         self.font = pygame.font.match_font(TEXT_FONT)
         self.load_files()
+        self.network = Network(server_ip, int(server_port))
 
     def new_game(self):
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
-        self.player = Player(self, ALLIE, (WIDTH/2, HEIGHT/2))
+        p_data = self.network.my_player_data
+        enemy_data = self.network.start_enemy(ServerPkt(PLAYER, p_data))
+        self.my_player = Player(self, p_data, True)
+        self.enemy_player = Player(self, enemy_data, False)
         self.alliebullets = pygame.sprite.Group()
         self.enemybullets = pygame.sprite.Group()
-        self.allbullets = pygame.sprite.Group()
-        self.all_sprites.add(self.player)
+        self.all_sprites.add(self.my_player)
+        self.all_sprites.add(self.enemy_player)
         self.moscou_song.play(-1)
 
     def run(self):
         # game loop
         self.playing = True
+        new_thread = threading.Thread(target=self.network.receive, args=(id(self),))
+        new_thread.start()
         while self.playing:
             self.dt = self.timer.tick(FPS) / 1000.0
             self.events()
@@ -186,9 +207,13 @@ class Game:
 
 
 if __name__ == "__main__":
+    file, server_ip, server_port = sys.argv
     game = Game()
     game.show_start_screen()
-
+    #TODO game.show_await_screen()
+    my_player = game.network.connect()
+    if(my_player.pid == 0):
+        game.network.await_match()
     while game.is_running:
         game.new_game()
         game.run()
