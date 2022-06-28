@@ -4,6 +4,7 @@ from player_data import *
 from constants import *
 import ctypes
 from sprites import *
+import pygame
 
 class Network:
     def __init__(self, ip, port):
@@ -102,6 +103,14 @@ class Network:
                             game.enemybullets.add(b)
                         
                         game.all_sprites.add(b)
-
             except error:
                 print(f"Error on network receive")
+            
+            '''
+            allie_hits = pygame.sprite.spritecollide(game.enemy_player, game.alliebullets, True)
+            if allie_hits:
+                game.enemy_player.explode()
+            enemy_hits = pygame.sprite.spritecollide(game.my_player, game.enemybullets, True)
+            if enemy_hits:
+                game.my_player.explode()
+            '''

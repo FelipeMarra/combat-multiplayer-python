@@ -124,6 +124,8 @@ class Game(metaclass=SingletonMeta):
         self.moscou_song = pygame.mixer.Sound(os.path.join(self.audios_directory, MOSCOU_DEFENDER))
         self.moscou_song.set_volume(0.1)
         self.beep_sound = pygame.mixer.Sound(os.path.join(self.audios_directory, BEEP_SOUND))
+        self.explosion_sound = pygame.mixer.Sound(os.path.join(self.audios_directory, EXPLOSION_SOUND))
+        self.explosion_sound.set_volume(0.3)
 
         # player
         self.player_image = pygame.image.load(os.path.join(images_directory, TANK_BLUE)).convert_alpha()

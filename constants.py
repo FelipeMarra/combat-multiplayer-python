@@ -38,6 +38,7 @@ AOT_OPENING = 'aotopening.wav'
 MOSCOU_DEFENDER = 'moscoudefender.wav'
 BEEP_SOUND = 'beep.wav'
 
+
 #TEXT
 TEXT_FONT = "arial"
 
@@ -57,3 +58,6 @@ BULLET_RATE = 1000
 LATERAL = "hitting_lateral"
 UPDOWN = "hitting_updown"
 
+#Explosion
+EXPLOSION_SOUND = 'explosion.wav'
+EXPLOSION_SPEED = 4
