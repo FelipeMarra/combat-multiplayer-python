@@ -139,6 +139,7 @@ class Bullet(pg.sprite.Sprite):
         self.rotate()
         self.channel = pg.mixer.find_channel()
         self.play_sound(self.game.bullet_song)
+        self.bounced = list()
 
     def rotate(self):
         mouse_x, mouse_y = pg.mouse.get_pos()
@@ -146,18 +147,6 @@ class Bullet(pg.sprite.Sprite):
         angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
         self.image = pg.transform.rotate(self.original_image, int(angle))
         self.rect = self.image.get_rect(center=self.pos)
-        
-    def check_walls(self):
-        walls_hitten = pg.sprite.spritecollide(self, self.game.walls, False)
-        for wall in walls_hitten:
-            if (self.rect.right - wall.rect.left) < BULLET_COLLISION_TOLLERANCE:
-                return LATERAL
-            elif (wall.rect.bottom -self.rect.top) < BULLET_COLLISION_TOLLERANCE:
-                return UPDOWN
-            elif (self.rect.bottom - wall.rect.top) < BULLET_COLLISION_TOLLERANCE:
-                return UPDOWN
-            elif (wall.rect.right -self.rect.left) < BULLET_COLLISION_TOLLERANCE:
-                return LATERAL
 
     def play_sound(self, song):
         self.channel.get_queue()
@@ -177,17 +166,30 @@ class Bullet(pg.sprite.Sprite):
         if pg.time.get_ticks() - self.spawn_time > BULLET_LIFETIME:
             self.kill()
 
-        wall_hit_direction = self.check_walls()
         
-        # hit the wall and go the other way
-        if self.pos.x > WIDTH or self.pos.x < 0 or wall_hit_direction == LATERAL:
+        
+        # hit the border and go the other way
+        if self.pos.x > WIDTH or self.pos.x < 0:
             # hit the lateral of the screen
             self.bounce(LATERAL)
-
-        if self.pos.y < 0 or self.pos.y > HEIGHT or wall_hit_direction == UPDOWN:
+            
+        if self.pos.y < 0 or self.pos.y > HEIGHT:
             # hit up or down in the screen
             self.bounce(UPDOWN)
-
+            
+        #bounce in the walls 
+        walls_hit = pg.sprite.spritecollide(self, self.game.walls, False)
+        for wall in walls_hit:
+            if abs(wall.rect.top - self.rect.bottom) < BULLET_COLLISION_TOLLERANCE:
+                self.bounce(UPDOWN)
+            if abs(wall.rect.bottom - self.rect.top) < BULLET_COLLISION_TOLLERANCE:
+                self.bounce(UPDOWN)
+            if abs(wall.rect.right - self.rect.left) < BULLET_COLLISION_TOLLERANCE:
+                self.bounce(LATERAL)
+            if abs(wall.rect.left - self.rect.right) < BULLET_COLLISION_TOLLERANCE:
+                self.bounce(LATERAL)
+            
+            
 
         if pg.sprite.spritecollide(self.game.enemy_player, self.game.alliebullets, False):
             self.game.enemy_player.explode(bullet=self)
@@ -200,7 +202,7 @@ class Wall(pg.sprite.Sprite):
         self.image = pg.Surface(size)
         self.image.fill(BLUE)
         self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = pos
+        self.rect.center = pos
 
 class Explosion(pg.sprite.Sprite):
     def __init__(self, game, pos):

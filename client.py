@@ -143,9 +143,9 @@ class Game(metaclass=SingletonMeta):
 
         # bullet
         self.blue_bullet = pygame.image.load(os.path.join(images_directory, BLUEBULLET)).convert_alpha()
-        self.blue_bullet = pygame.transform.scale(self.blue_bullet, (25, 25))
+        self.blue_bullet = pygame.transform.scale(self.blue_bullet, BULLET_SIZE)
         self.red_bullet = pygame.image.load(os.path.join(images_directory, REDBULLET)).convert_alpha()
-        self.red_bullet = pygame.transform.scale(self.red_bullet, (25, 25))
+        self.red_bullet = pygame.transform.scale(self.red_bullet, BULLET_SIZE)
         self.bullet_song = pg.mixer.Sound(os.path.join(self.audios_directory, BULLET_SOUND))
         self.bullet_song.set_volume(0.5)
 
@@ -213,7 +213,35 @@ class Game(metaclass=SingletonMeta):
     
     def wall_creator(self, map):
         if map==1:
-            wall = Wall((WIDTH/2, HEIGHT/2), (300, 20))
+            wall = Wall((200, HEIGHT/2), (15, 300))
+            self.walls.add(wall)
+            self.all_sprites.add(wall)
+            
+            wall = Wall((WIDTH - 200, HEIGHT/2), (15, 300))
+            self.walls.add(wall)
+            self.all_sprites.add(wall)
+            
+            wall = Wall((350, HEIGHT/2), (50, 50))
+            self.walls.add(wall)
+            self.all_sprites.add(wall)
+            
+            wall = Wall((WIDTH - 350, HEIGHT/2), (50, 50))
+            self.walls.add(wall)
+            self.all_sprites.add(wall)
+            
+            wall = Wall((475, (HEIGHT/4)*1), (80, 25))
+            self.walls.add(wall)
+            self.all_sprites.add(wall)
+            
+            wall = Wall((475, (HEIGHT/4)*3), (80, 25))
+            self.walls.add(wall)
+            self.all_sprites.add(wall)
+            
+            wall = Wall((WIDTH - 475, (HEIGHT/4)*1), (80, 25))
+            self.walls.add(wall)
+            self.all_sprites.add(wall)
+            
+            wall = Wall((WIDTH - 475, (HEIGHT/4)*3), (80, 25))
             self.walls.add(wall)
             self.all_sprites.add(wall)
             
