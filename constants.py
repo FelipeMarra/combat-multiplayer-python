@@ -47,6 +47,7 @@ TANK_BLUE = "tank_blue.png"
 TANK_RED = "tank_red.png"
 PLAYER_ACC = 0.5
 PLAYER_FRICTION = -0.2
+COLLISION_TOLLERANCE = 25
 
 #Bullet Settings
 BLUEBULLET = "bluebullet.png"
@@ -57,6 +58,7 @@ BULLET_LIFETIME = 6000
 BULLET_RATE = 1000
 LATERAL = "hitting_lateral"
 UPDOWN = "hitting_updown"
+BULLET_COLLISION_TOLLERANCE = 15
 
 #Explosion
 EXPLOSION_SOUND = 'explosion.wav'

@@ -41,9 +41,13 @@ class Game(metaclass=SingletonMeta):
         self.enemy_player = Player(self, enemy_data, False)
         self.alliebullets = pygame.sprite.Group()
         self.enemybullets = pygame.sprite.Group()
+        self.walls = pygame.sprite.Group()
+        self.wall_creator(map = 1)
         self.all_sprites.add(self.my_player)
         self.all_sprites.add(self.enemy_player)
         self.moscou_song.play(-1)
+        
+        
 
     def run(self):
         # game loop
@@ -72,13 +76,13 @@ class Game(metaclass=SingletonMeta):
         # cleaning screen
         self.screen.fill(BLACK)
         self.screen.blit(self.map_background, self.map_background.get_rect())
+        # drawing sprits
+        self.all_sprites.draw(self.screen)
         #draw pointer
         pygame.mouse.set_visible(False)
         self.pointerImg_rect = self.pointerImg.get_rect()
         self.pointerImg_rect.center = pygame.mouse.get_pos()
         self.screen.blit(self.pointerImg, self.pointerImg_rect)
-        # drawing sprits
-        self.all_sprites.draw(self.screen)
         pygame.display.flip()
 
     # load audio and images
@@ -206,7 +210,13 @@ class Game(metaclass=SingletonMeta):
 
     def show_game_over_screen(self):
         pass
-
+    
+    def wall_creator(self, map):
+        if map==1:
+            wall = Wall((WIDTH/2, HEIGHT/2), (300, 20))
+            self.walls.add(wall)
+            self.all_sprites.add(wall)
+            
 
 if __name__ == "__main__":
     file, server_ip, server_port = sys.argv
