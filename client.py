@@ -247,9 +247,10 @@ class Game(metaclass=SingletonMeta):
             
 
 if __name__ == "__main__":
-    file, server_ip, server_port = sys.argv
+    file, server_ip, server_port, test_mode = sys.argv
     game = Game()
-    game.show_start_screen()
+    if(test_mode != "True"):
+        game.show_start_screen()
     #TODO game.show_await_screen()
     my_player = game.network.connect()
     if(my_player.pid == 0):
