@@ -60,3 +60,6 @@ BULLET_SIZE = (20, 20)
 #Explosion
 EXPLOSION_SOUND = 'explosion.wav'
 EXPLOSION_SPEED = 4
+
+#server/network
+BUFFER_SIZE = 1024

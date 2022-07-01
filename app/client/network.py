@@ -12,7 +12,6 @@ class Network():
         self.client = socket(AF_INET, SOCK_STREAM)
         self.server = ip
         self.port = port
-        self.buffer = 1024*2
         self.addr = (ip, port)
         self.my_player_data = None
         self.enemy_player_data = None
@@ -31,7 +30,7 @@ class Network():
         
         try:
             #pacote do jogador
-            my_player = pickle.loads(self.client.recv(self.buffer))
+            my_player = pickle.loads(self.client.recv(BUFFER_SIZE))
             print(f"Received initial player obj pid: {my_player.pid}")
             self.my_player_data = my_player
             return my_player
@@ -44,7 +43,7 @@ class Network():
     def await_match(self):
         while True:
             try:
-                data = self.client.recv(self.buffer)
+                data = self.client.recv(BUFFER_SIZE)
                 if(data):
                     server_pkt = pickle.loads(data)
                     if server_pkt:
@@ -59,7 +58,7 @@ class Network():
         try:
             self.client.send(pickle.dumps(server_pkt))
             #In case we're sending our player update for the first time we want to get others back
-            return pickle.loads(self.client.recv(self.buffer))
+            return pickle.loads(self.client.recv(BUFFER_SIZE))
         except error:
             print(f"Error sending pkt type {type(error)}")
 
@@ -73,7 +72,7 @@ class Network():
         game = ctypes.cast(game, ctypes.py_object).value
         while True:
             try:
-                data = self.client.recv(self.buffer)
+                data = self.client.recv(BUFFER_SIZE)
                 if data:
             
                     try:

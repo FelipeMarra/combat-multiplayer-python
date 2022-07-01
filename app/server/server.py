@@ -10,7 +10,6 @@ class Server:
     def __init__(self):
         self.players_sockets = []
         self.serverSocket = None
-        self.buffer = 1024*2
 
     #Create Server and return server socket
     def start(self, server_port):
@@ -61,7 +60,7 @@ class Server:
         #Se já ta rolando aquele joguin brabo
         while True:
             try:
-                data = client_socket.recv(self.buffer)
+                data = client_socket.recv(BUFFER_SIZE)
                 if data:
                     server_pkt = pickle.loads(data)
                     if server_pkt:
