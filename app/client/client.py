@@ -8,7 +8,7 @@ from app import *
 from app.client.sprites import *
 
 from app.client.midia import midia_loader
-from app.client.screens import start_screen, game_over_screen
+from app.client.screens import start_screen, settings_screen, await_screen, game_over_screen
 from app.client.network import Network
 
 class Game(metaclass=SingletonMeta):
@@ -22,7 +22,8 @@ class Game(metaclass=SingletonMeta):
         self.is_running = True
         self.font = pygame.font.match_font(TEXT_FONT)
         midia_loader.load_files(self)
-        self.network = Network(server_ip, int(server_port))
+        self.network = Network(SERVER_IP, SERVER_PORT)
+        self.map = 1
 
     def new_game(self):
         # intanciating sprites
@@ -34,7 +35,7 @@ class Game(metaclass=SingletonMeta):
         self.alliebullets = pygame.sprite.Group()
         self.enemybullets = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
-        wall_creator(self, map = 1)
+        wall_creator(self, self.map)
         self.all_sprites.add(self.my_player)
         self.all_sprites.add(self.enemy_player)
         self.moscou_song.play(-1)
@@ -62,14 +63,26 @@ class Game(metaclass=SingletonMeta):
 
 if __name__ == "__main__":
     file, server_ip, server_port, test_mode = sys.argv
+    
+    SERVER_IP = server_ip
+    SERVER_PORT = int(server_port)
+
     game = Game()
+
     if(test_mode != "True"):
-        start_screen.show()
-    #TODO game.show_await_screen()
+        start_screen.show(game)
+
     my_player = game.network.connect()
+
     if(my_player.pid == 0):
-        game.network.await_match()
+        game.map = settings_screen.show(game)
+        print(f"Mapa escolhido: {game.map}")
+        await_screen.show(game)
+
+    if(my_player.pid == 1):
+        await_screen.show(game)
+
     while game.is_running:
         game.new_game()
         game.run()
-        game_over_screen.show()
+        #TODO game_over_screen.show(game)

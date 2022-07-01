@@ -27,7 +27,7 @@ class Network():
             print(f"Error trying to connect")
             self.client.close()
             quit()
-        
+
         try:
             #pacote do jogador
             my_player = pickle.loads(self.client.recv(BUFFER_SIZE))
@@ -39,20 +39,21 @@ class Network():
             self.client.close()
             quit()
 
-    #Quando o pacote do jodor tem id 0 precisamos aguardar para receber o prox
-    def await_match(self):
-        while True:
-            try:
-                data = self.client.recv(BUFFER_SIZE)
-                if(data):
-                    server_pkt = pickle.loads(data)
-                    if server_pkt:
-                        self.enemy_player_data = server_pkt
-                        return server_pkt
-            except:
-                print("Error on matchmaking")
-                self.client.close()
-                quit()
+    #Envia para o servidor o comando que pede quantos jogadores estão prontos e retorna a resposta
+    def get_game_is_ready(self):
+        try:
+            self.client.send(pickle.dumps(GET_GAME_IS_READY))
+            data = self.client.recv(BUFFER_SIZE)
+            if(data):
+                n_ready = pickle.loads(data)
+                return True if n_ready == 2 else False
+        except:
+            print(f"Error getting if game is ready")
+            self.client.close()
+            quit()
+
+    def send_pid_is_ready(self):
+        self.client.send(pickle.dumps(POST_PID_IS_READY))
 
     def start_enemy(self, server_pkt):
         try:
@@ -101,12 +102,3 @@ class Network():
                         game.all_sprites.add(b)
             except error:
                 print(f"Error on network receive")
-            
-            '''
-            allie_hits = pygame.sprite.spritecollide(game.enemy_player, game.alliebullets, True)
-            if allie_hits:
-                game.enemy_player.explode()
-            enemy_hits = pygame.sprite.spritecollide(game.my_player, game.enemybullets, True)
-            if enemy_hits:
-                game.my_player.explode()
-            '''

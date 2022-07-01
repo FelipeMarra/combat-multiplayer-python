@@ -2,10 +2,8 @@ import pygame
 from app import *
 
 import app.client.screens.screen_utils as screen
-import app.client.client as client
 
-def show():
-    game = client.Game()
+def show(game):
     game.start_song.play(-1)
     font_fade = pygame.USEREVENT + 1
     show_text = True
@@ -50,7 +48,7 @@ def show():
             game.screen.blit(game.tank_wallpaper2, wallpaper2_tank_rect)
 
             if show_text:
-                screen.show_text('PRESS ANY KEY TO CONNECT', 32, YELLOW, WIDTH / 2, HEIGHT / 2 + 50)
+                screen.show_text(game, 'PRESS ANY KEY TO CONNECT', 32, YELLOW, WIDTH / 2, HEIGHT / 2 + 50)
 
-            screen.show_text('Developed by Marra & Galli & Furi', 19, WHITE, WIDTH / 2, HEIGHT - 20)
+            screen.show_text(game, 'Developed by Marra & Galli & Furi', 19, WHITE, WIDTH / 2, HEIGHT - 20)
             pygame.display.flip()

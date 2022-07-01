@@ -9,6 +9,7 @@ from app import *
 class Server:
     def __init__(self):
         self.players_sockets = []
+        self.ready_players = []
         self.serverSocket = None
 
     #Create Server and return server socket
@@ -53,10 +54,12 @@ class Server:
             print(f"Client {addr} entered the game.")
             player = PlayerData(pid, PLAYER_POSITION_1)
             client_socket.send(pickle.dumps(player))
+            self.ready_players.append(pid)
+            print("Player 1 be ready")
             #send to first player that a new player entered the game
             self.players_sockets[0].send(pickle.dumps(player))
             print("Game Started!!!")
-        
+
         #Se já ta rolando aquele joguin brabo
         while True:
             try:
@@ -69,11 +72,20 @@ class Server:
                             for player_socket in self.players_sockets:
                                 if(player_socket != client_socket):
                                     player_socket.send(pickle.dumps(server_pkt))
-                        if type(server_pkt) is BulletData:
+                        elif type(server_pkt) is BulletData:
                             for player_socket in self.players_sockets:
                                 player_socket.send(pickle.dumps(server_pkt))
+                        #if its not a class is a string command 
+                        else:
+                            #command to know how many players are ready
+                            if(server_pkt == GET_GAME_IS_READY):
+                                print(f"Temos {len(self.ready_players)} jogadores prontos")
+                                client_socket.send(pickle.dumps(len(self.ready_players)))
+                            #TODO fazer classe comando para receber comadnos com tipos de dados diferentes? 
+                            if(server_pkt == POST_PID_IS_READY):
+                                print(f"Player ? disse que esta pronto")
+                                pickle.dumps(self.ready_players.append(0))
 
-                        
             except error:
                 print(f"Erro ao ouvir cliente {addr}: {type(error)}: {error.args}")
                 break

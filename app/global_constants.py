@@ -61,5 +61,11 @@ BULLET_SIZE = (20, 20)
 EXPLOSION_SOUND = 'explosion.wav'
 EXPLOSION_SPEED = 4
 
-#server/network
+#server/network settings
 BUFFER_SIZE = 1024
+SERVER_IP = -1
+SERVER_PORT = -1
+
+#server/network commands
+GET_GAME_IS_READY = "GET GAME_IS_READY"
+POST_PID_IS_READY = "POST PID_IS_READY"
