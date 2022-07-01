@@ -1,15 +1,11 @@
 import pygame
 
 from app import *
-from app.client.client import Game
 
-def update_sprites():
-    game = Game()
-    
+def update_sprites(game):
     game.all_sprites.update()
 
-def draw_sprites():
-    game = Game()
+def draw_sprites(game):
     # cleaning screen
     game.screen.fill(BLACK)
     game.screen.blit(game.map_background, game.map_background.get_rect())

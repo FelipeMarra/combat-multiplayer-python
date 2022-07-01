@@ -1,10 +1,11 @@
 import pygame
 from app import *
-from app.client.client import Game
-import screen_utils as screen
+
+import app.client.screens.screen_utils as screen
+import app.client.client as client
 
 def show():
-    game = Game()
+    game = client.Game()
     game.start_song.play(-1)
     font_fade = pygame.USEREVENT + 1
     show_text = True

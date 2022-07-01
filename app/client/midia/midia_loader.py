@@ -3,13 +3,11 @@ import os
 import pygame
 
 from app import *
-from app.client.client import Game
 
 # load audio and images
-def load_files():
-    game = Game()
-    images_directory = os.path.join(os.getcwd(), "images")
-    game.audios_directory = os.path.join(os.getcwd(), "audios")
+def load_files(game):
+    images_directory = os.path.join(os.getcwd(), "app/client/midia/images")
+    game.audios_directory = os.path.join(os.getcwd(), "app/client/midia/audios")
     game.test_tank_sheet = os.path.join(images_directory, TEST_TANK_SHEET)
     game.test_map = os.path.join(images_directory, TEST_MAP_SHEET)
     # get and scale logo

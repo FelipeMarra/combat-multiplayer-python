@@ -1,6 +1,5 @@
 import pygame as pg
 from app import *
-from app.client.client import Game
 
 class Wall(pg.sprite.Sprite):
     def __init__(self, pos, size):
@@ -10,8 +9,7 @@ class Wall(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = pos
 
-    def wall_creator(self, map):
-        game = Game()
+    def wall_creator(self, game, map):
         if map==1:
             wall = Wall((200, HEIGHT/2), (15, 300))
             game.walls.add(wall)
