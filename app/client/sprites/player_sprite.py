@@ -1,6 +1,6 @@
 import math
 import pygame as pg
-from explosion_sprite import Explosion
+from app.client.sprites.explosion_sprite import Explosion
 from app import *
 
 vec = pg.math.Vector2

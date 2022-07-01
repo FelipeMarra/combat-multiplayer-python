@@ -5,7 +5,6 @@ from app import *
 class Explosion(pg.sprite.Sprite):
     def __init__(self, game, pos):
         pg.sprite.Sprite.__init__(self)
-        animation_directory = os.path.join(os.getcwd(), "midia/images/boom")
         self.game = game
         self.pos = pos
         self.images = []	
@@ -13,7 +12,7 @@ class Explosion(pg.sprite.Sprite):
         self.play_sound(self.game.explosion_sound)
         
         for num in range(1, 6):
-            img = pg.image.load(os.path.join(animation_directory, f"exp{num}.png"))
+            img = pg.image.load(os.path.join(game.animation_directory, f"exp{num}.png"))
             img = pg.transform.scale(img, (100,100))
             self.images.append(img)
             

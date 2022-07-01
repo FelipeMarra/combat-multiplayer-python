@@ -5,7 +5,7 @@ import pygame
 
 from app import *
 
-import app.client.sprites as sprites
+from app.client.sprites import *
 
 from app.client.midia import midia_loader
 from app.client.screens import start_screen, game_over_screen
@@ -29,12 +29,12 @@ class Game(metaclass=SingletonMeta):
         self.all_sprites = pygame.sprite.Group()
         p_data = self.network.my_player_data
         enemy_data = self.network.start_enemy(ServerPkt(PLAYER, p_data))
-        self.my_player = sprites.Player(self, p_data, True)
-        self.enemy_player = sprites.Player(self, enemy_data, False)
+        self.my_player = Player(self, p_data, True)
+        self.enemy_player = Player(self, enemy_data, False)
         self.alliebullets = pygame.sprite.Group()
         self.enemybullets = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
-        sprites.Wall.wall_creator(self, map = 1)
+        wall_creator(self, map = 1)
         self.all_sprites.add(self.my_player)
         self.all_sprites.add(self.enemy_player)
         self.moscou_song.play(-1)
@@ -48,8 +48,8 @@ class Game(metaclass=SingletonMeta):
         while self.playing:
             self.dt = self.timer.tick(FPS) / 1000.0
             self.events()
-            sprites.update_sprites(self)
-            sprites.draw_sprites(self)
+            update_sprites(self)
+            draw_sprites(self)
 
 
     def events(self):
