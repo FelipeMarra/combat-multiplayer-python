@@ -1,5 +1,4 @@
 import sys
-import os.path
 from socket import *
 import threading
 
