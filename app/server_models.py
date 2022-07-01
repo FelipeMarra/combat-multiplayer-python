@@ -1,6 +1,6 @@
 import pygame as pg
 vec = pg.math.Vector2
-from constants import *
+from app.global_constants import *
 
 class ServerPkt():
     def __init__(self, type, data):

@@ -1,12 +1,11 @@
 from socket import *
 import pickle
-from player_data import *
-from constants import *
+from app.server_models import *
+from app.global_constants import *
 import ctypes
-from sprites import *
-import pygame
+from client.sprites import *
 
-class Network:
+class Network():
     def __init__(self, ip, port):
         self.client = socket(AF_INET, SOCK_STREAM)
         self.server = ip
@@ -69,8 +68,8 @@ class Network:
         except error:
             print(f"Error sending pkt type {type(error)}")
 
-    def receive(self, game):
-        game = ctypes.cast(game, ctypes.py_object).value
+    def receive(self):
+        game = Game()
         while True:
             try:
                 data = self.client.recv(self.buffer)
