@@ -2,11 +2,6 @@ import pygame as pg
 vec = pg.math.Vector2
 from app.global_constants import *
 
-class ServerPkt():
-    def __init__(self, type, data):
-        self.type = type
-        self.data = data
-
 class PlayerData():
     def __init__(self, pid, initial_position):
         self.pid = pid

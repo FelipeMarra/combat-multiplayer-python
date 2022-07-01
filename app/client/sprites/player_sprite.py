@@ -57,7 +57,7 @@ class Player(pg.sprite.Sprite):
             dir = vec(dx, dy)
             pos = self.pos
             #Send to server
-            self.game.network.send(ServerPkt(BULLET, BulletData(pos, dir, dx, dy, self.pid)))
+            self.game.network.send(BulletData(pos, dir, dx, dy, self.pid))
     
     def explode(self, bullet):
         if self in self.game.all_sprites.sprites():
@@ -113,4 +113,4 @@ class Player(pg.sprite.Sprite):
             self.game.network.my_player_data.angle = angle
 
             #send update to server
-            self.game.network.send(ServerPkt(PLAYER, self.game.network.my_player_data))
+            self.game.network.send(self.game.network.my_player_data)

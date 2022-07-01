@@ -47,17 +47,15 @@ class Server:
         if(pid == 0):
             print(f"Client {addr} started a new game.")
             player = PlayerData(pid, PLAYER_POSITION_0)
-            pkt = ServerPkt(PLAYER, player)
-            client_socket.send(pickle.dumps(pkt))
+            client_socket.send(pickle.dumps(player))
             print("Awaiting next player")
         #If there is another player pid is 1
         elif(pid == 1):
             print(f"Client {addr} entered the game.")
             player = PlayerData(pid, PLAYER_POSITION_1)
-            pkt = ServerPkt(PLAYER, player)
-            client_socket.send(pickle.dumps(pkt))
+            client_socket.send(pickle.dumps(player))
             #send to first player that a new player entered the game
-            self.players_sockets[0].send(pickle.dumps(pkt))
+            self.players_sockets[0].send(pickle.dumps(player))
             print("Game Started!!!")
         
         #Se já ta rolando aquele joguin brabo
@@ -68,11 +66,11 @@ class Server:
                     server_pkt = pickle.loads(data)
                     if server_pkt:
                         #Send my update to all other players
-                        if server_pkt.type == PLAYER:
+                        if type(server_pkt) is PlayerData:
                             for player_socket in self.players_sockets:
                                 if(player_socket != client_socket):
                                     player_socket.send(pickle.dumps(server_pkt))
-                        if server_pkt.type == BULLET:
+                        if type(server_pkt) is BulletData:
                             for player_socket in self.players_sockets:
                                 player_socket.send(pickle.dumps(server_pkt))
 

@@ -6,10 +6,6 @@ HEIGHT = 720
 PLAYER_POSITION_0 = (100, HEIGHT/2)
 PLAYER_POSITION_1 = (WIDTH-100, HEIGHT/2)
 
-#types
-PLAYER = "player"
-BULLET = "bullet"
-
 #game title
 GAME_TITLE = "Combat Multiplayer"
 

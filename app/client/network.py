@@ -31,8 +31,7 @@ class Network():
         
         try:
             #pacote do jogador
-            server_pkt = pickle.loads(self.client.recv(self.buffer))
-            my_player = server_pkt.data
+            my_player = pickle.loads(self.client.recv(self.buffer))
             print(f"Received initial player obj pid: {my_player.pid}")
             self.my_player_data = my_player
             return my_player
@@ -49,8 +48,8 @@ class Network():
                 if(data):
                     server_pkt = pickle.loads(data)
                     if server_pkt:
-                        self.enemy_player_data = server_pkt.data
-                        return server_pkt.data
+                        self.enemy_player_data = server_pkt
+                        return server_pkt
             except:
                 print("Error on matchmaking")
                 self.client.close()
@@ -60,7 +59,7 @@ class Network():
         try:
             self.client.send(pickle.dumps(server_pkt))
             #In case we're sending our player update for the first time we want to get others back
-            return pickle.loads(self.client.recv(self.buffer)).data
+            return pickle.loads(self.client.recv(self.buffer))
         except error:
             print(f"Error sending pkt type {type(error)}")
 
@@ -83,9 +82,8 @@ class Network():
                         #Pickle raises exception when moving game window borders
                         pass
 
-                    if server_pkt.type == PLAYER:
-                        enemy_data = server_pkt.data
-                        game.network.enemy_player_data = enemy_data
+                    if type(server_pkt) is PlayerData:
+                        game.network.enemy_player_data = server_pkt
                         game.enemy_player.pos = game.network.enemy_player_data.pos
                         game.enemy_player.vel = game.network.enemy_player_data.vel
                         game.enemy_player.acc = game.network.enemy_player_data.acc
@@ -93,12 +91,10 @@ class Network():
                         game.enemy_player.rect.center = game.enemy_player.pos
                         game.enemy_player.rotate(game.enemy_player.angle)
                     
-                    if server_pkt.type == BULLET:
-                        #self.game.network.send(ServerPkt(BULLET, BulletData(pos, dir, dx, dy, self.pid)))
-                        bullet_data = server_pkt.data
-                        b = Bullet(game, bullet_data.pos, bullet_data.dir, bullet_data.dx, bullet_data.dy, bullet_data.pid)
+                    if type(server_pkt) is BulletData:
+                        b = Bullet(game, server_pkt.pos, server_pkt.dir, server_pkt.dx, server_pkt.dy, server_pkt.pid)
                         
-                        if bullet_data.pid == game.my_player.pid:
+                        if server_pkt.pid == game.my_player.pid:
                             game.alliebullets.add(b)
                         else:
                             game.enemybullets.add(b)
