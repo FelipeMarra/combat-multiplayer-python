@@ -3,7 +3,6 @@ from socket import *
 import threading
 
 import pickle
-from tkinter import E
 
 from app import *
 
