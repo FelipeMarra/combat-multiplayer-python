@@ -46,7 +46,7 @@ def show(game):
                     return 1
 
 
-                if map_1_button.checkForInput(mouse_position):
+                if map_2_button.checkForInput(mouse_position):
                     game.network.send_pid_is_ready()
                     waiting = False
                     return 2

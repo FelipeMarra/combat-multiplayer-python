@@ -1,0 +1,1 @@
+python -m app.client.client {LOCAL_IP} {SERVER_PORT} {TEST_MODE}

@@ -16,6 +16,7 @@ class Game(metaclass=SingletonMeta):
         # Creating screem
         pygame.init()
         pygame.mixer.init(frequency=22050, size=-16, channels=4)
+        self.map = 1
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
         self.timer = pygame.time.Clock()
@@ -23,7 +24,7 @@ class Game(metaclass=SingletonMeta):
         self.font = pygame.font.match_font(TEXT_FONT)
         midia_loader.load_files(self)
         self.network = Network(SERVER_IP, SERVER_PORT)
-        self.map = 1
+        
 
     def new_game(self):
         # intanciating sprites
@@ -62,6 +63,7 @@ class Game(metaclass=SingletonMeta):
                 self.is_running = False
 
 if __name__ == "__main__":
+    test_mode = "False"
     file, server_ip, server_port, test_mode = sys.argv
     
     SERVER_IP = server_ip

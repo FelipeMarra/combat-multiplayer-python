@@ -9,6 +9,7 @@ def load_files(game):
     images_directory = os.path.join(os.getcwd(), "app/client/midia/images")
     game.audios_directory = os.path.join(os.getcwd(), "app/client/midia/audios")
     game.animation_directory = os.path.join(os.getcwd(), f"{images_directory}/boom")
+    game.maps_directory = os.path.join(os.getcwd(), f"{images_directory}/maps")
     game.test_tank_sheet = os.path.join(images_directory, TEST_TANK_SHEET)
     game.test_map = os.path.join(images_directory, TEST_MAP_SHEET)
     # get and scale logo
@@ -19,10 +20,6 @@ def load_files(game):
     game.start_background = os.path.join(images_directory, START_BACKGROUND)
     game.start_background = pygame.image.load(game.start_background).convert()
     game.start_background = pygame.transform.scale(game.start_background, (WIDTH, HEIGHT))
-    #map
-    game.map_background = os.path.join(images_directory, MAPBACKGROUND)
-    game.map_background = pygame.image.load(game.map_background).convert_alpha()
-    game.map_background = pygame.transform.smoothscale(game.map_background, (WIDTH, HEIGHT))
 
     #pointer
     game.pointerImg = os.path.join(images_directory, POINTER)

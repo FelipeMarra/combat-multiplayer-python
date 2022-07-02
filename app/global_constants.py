@@ -26,7 +26,6 @@ TEST_MAP_SHEET = "tank_01_grey.png"
 START_LOGO = "atari_combat_logo.png"
 TANK_WALLPAPER = "tankwallpaper.png"
 START_BACKGROUND = "background.jpg"
-MAPBACKGROUND = "mapbackground.png"
 POINTER = "pointer_image.png"
 
 #Audios
