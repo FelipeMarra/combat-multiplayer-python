@@ -10,7 +10,17 @@ class Server:
     def __init__(self):
         self.players_sockets = []
         self.ready_players = []
+        self.game_map = -1
         self.serverSocket = None
+    
+    def send_all(self, server_pkt):
+        for player_socket in self.players_sockets:
+            player_socket.send(pickle.dumps(server_pkt))
+
+    def send_others(self, client_socket, server_pkt):
+        for player_socket in self.players_sockets:
+            if(player_socket != client_socket):
+                player_socket.send(pickle.dumps(server_pkt))
 
     #Create Server and return server socket
     def start(self, server_port):
@@ -26,7 +36,7 @@ class Server:
             self.handle_connections()
         except:
             raise Exception("Can't create server")
-    
+
     def handle_connections(self):
         while True:
             #Não aceitar mais que dois players
@@ -69,22 +79,30 @@ class Server:
                     if server_pkt:
                         #Send my update to all other players
                         if type(server_pkt) is PlayerData:
-                            for player_socket in self.players_sockets:
-                                if(player_socket != client_socket):
-                                    player_socket.send(pickle.dumps(server_pkt))
+                            self.send_others(client_socket, server_pkt)
+
                         elif type(server_pkt) is BulletData:
-                            for player_socket in self.players_sockets:
-                                player_socket.send(pickle.dumps(server_pkt))
+                            self.send_all(server_pkt)
+
                         #if its not a class is a string command 
-                        else:
+                        elif type(server_pkt) is Command:
                             #command to know how many players are ready
-                            if(server_pkt == GET_GAME_IS_READY):
-                                print(f"Temos {len(self.ready_players)} jogadores prontos")
-                                client_socket.send(pickle.dumps(len(self.ready_players)))
-                            #TODO fazer classe comando para receber comadnos com tipos de dados diferentes? 
-                            if(server_pkt == POST_PID_IS_READY):
-                                print(f"Player ? disse que esta pronto")
-                                pickle.dumps(self.ready_players.append(0))
+                            if(server_pkt.type == GET_GAME_IS_READY):
+                                if len(self.ready_players) == N_PLAYERS and self.game_map != -1:
+                                    client_socket.send(pickle.dumps(self.game_map))
+                                else:
+                                    client_socket.send(pickle.dumps(-1))
+
+                            if(server_pkt.type == POST_PID_IS_READY):
+                                print(f"Player {server_pkt.data} disse que esta pronto")
+                                pickle.dumps(self.ready_players.append(server_pkt.data))
+
+                            if(server_pkt.type == POST_GAME_MAP):
+                                print(f"Player {server_pkt.data} selecionou o mapa {server_pkt.data}")
+                                self.game_map = server_pkt.data
+
+                            if(server_pkt.type == POST_GAME_RESET):
+                                self.send_all(server_pkt)
 
             except error:
                 print(f"Erro ao ouvir cliente {addr}: {type(error)}: {error.args}")

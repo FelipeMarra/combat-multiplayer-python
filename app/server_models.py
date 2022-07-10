@@ -2,6 +2,11 @@ import pygame as pg
 vec = pg.math.Vector2
 from app.global_constants import *
 
+class Command():
+    def __init__(self, type, data = None):
+        self.type = type
+        self.data = data
+
 class PlayerData():
     def __init__(self, pid, initial_position):
         self.pid = pid
@@ -9,6 +14,7 @@ class PlayerData():
         self.vel = (0, 0)
         self.acc = (0, 0)
         self.angle = 0
+        #TODO self.life = life
 
 class BulletData():
     def __init__(self, pos, dir, dx, dy, pid):
@@ -17,6 +23,10 @@ class BulletData():
         self.dx = dx
         self.dy = dy
         self.pid = pid
+
+class GameData():
+    def __init__(self, map):
+        self.map = map
 
 #Eu me conecto ao servidor
 #peço meu Player Data

@@ -5,6 +5,7 @@ HEIGHT = 720
 #positions
 PLAYER_POSITION_0 = (100, HEIGHT/2)
 PLAYER_POSITION_1 = (WIDTH-100, HEIGHT/2)
+POSITIONS = [PLAYER_POSITION_0, PLAYER_POSITION_1]
 
 #game title
 GAME_TITLE = "Combat Multiplayer"
@@ -38,6 +39,7 @@ BEEP_SOUND = 'beep.wav'
 TEXT_FONT = "arial"
 
 #Player Settings
+N_PLAYERS = 2
 TANK_BLUE = "tank_blue.png"
 TANK_RED = "tank_red.png"
 PLAYER_ACC = 0.5
@@ -68,3 +70,5 @@ SERVER_PORT = -1
 #server/network commands
 GET_GAME_IS_READY = "GET GAME_IS_READY"
 POST_PID_IS_READY = "POST PID_IS_READY"
+POST_GAME_MAP = "POST GAME_MAP"
+POST_GAME_RESET = "POST GAME_RESET"

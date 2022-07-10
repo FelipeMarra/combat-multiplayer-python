@@ -75,10 +75,10 @@ class Bullet(pg.sprite.Sprite):
                 self.bounce(LATERAL)
             if abs(wall.rect.left - self.rect.right) < BULLET_COLLISION_TOLLERANCE:
                 self.bounce(LATERAL)
-            
-            
 
         if pg.sprite.spritecollide(self.game.enemy_player, self.game.alliebullets, False):
             self.game.enemy_player.explode(bullet=self)
+
         if pg.sprite.spritecollide(self.game.my_player, self.game.enemybullets, False):
             self.game.my_player.explode(bullet=self)
+            self.game.network.send_game_reset()

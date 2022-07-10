@@ -14,7 +14,7 @@ def show(game):
     while waiting:
         game.timer.tick(120)
 
-        if game.network.get_game_is_ready():
+        if game.network.get_game_is_ready(game):
             waiting = False
             return
 

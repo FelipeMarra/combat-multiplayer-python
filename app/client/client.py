@@ -16,7 +16,7 @@ class Game(metaclass=SingletonMeta):
         # Creating screem
         pygame.init()
         pygame.mixer.init(frequency=22050, size=-16, channels=4)
-        self.map = 1
+        self.map = -1
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
         self.timer = pygame.time.Clock()
@@ -24,7 +24,6 @@ class Game(metaclass=SingletonMeta):
         self.font = pygame.font.match_font(TEXT_FONT)
         midia_loader.load_files(self)
         self.network = Network(SERVER_IP, SERVER_PORT)
-        
 
     def new_game(self):
         # intanciating sprites
@@ -62,6 +61,29 @@ class Game(metaclass=SingletonMeta):
                     self.playing = False
                 self.is_running = False
 
+    def reset(self):
+        #clear bullets and players sprits
+        for bullet in self.alliebullets:
+            bullet.kill()
+        for bullet in self.enemybullets:
+            bullet.kill()
+        self.enemy_player.kill()
+        self.my_player.kill()
+
+        #get next start position
+        enemmy_start_position = self.my_player.start_position 
+        print(f"NEW ENEMMY POS {enemmy_start_position}")
+        self.my_player.start_position = (self.my_player.start_position + 1) % 2
+        print(f"NEW MY P POS {self.my_player.start_position}")
+
+        #update player position data
+        self.my_player.pos = POSITIONS[self.my_player.start_position]
+        self.enemy_player.pos = POSITIONS[enemmy_start_position]
+
+        #add player data to screen
+        self.all_sprites.add(self.my_player)
+        self.all_sprites.add(self.enemy_player)
+
 if __name__ == "__main__":
     test_mode = "False"
     file, server_ip, server_port, test_mode = sys.argv
@@ -78,7 +100,7 @@ if __name__ == "__main__":
 
     if(my_player.pid == 0):
         game.map = settings_screen.show(game)
-        print(f"Mapa escolhido: {game.map}")
+        game.network.send_selected_map(game.map)
         await_screen.show(game)
 
     if(my_player.pid == 1):

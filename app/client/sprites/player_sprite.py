@@ -23,6 +23,7 @@ class Player(pg.sprite.Sprite):
         self.last_shot = -BULLET_RATE
         self.channel = pg.mixer.find_channel()
         self.itsMe = itsMe
+        self.start_position = self.pid
         
 
     def rotate(self, angle = None):
