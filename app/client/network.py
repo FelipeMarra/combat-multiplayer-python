@@ -18,7 +18,7 @@ class Network():
         self.enemy_player_data = None
 
     #Conecta ao servidor e recebe pacote correspondente ao jogador
-    def connect(self, game):
+    def connect(self):
         try:
             #conexão
             self.client.settimeout(5)
@@ -55,15 +55,6 @@ class Network():
     
     def send_player_data(self, bullet_data):
         self.client.send(pickle.dumps(bullet_data))
-
-    def get_data(self):
-        data = self.client.recv(BUFFER_SIZE)
-        if data:
-            try:
-                return pickle.loads(data)
-            except:
-                #Pickle raises exception when moving game window borders
-                pass
 
     def start_receive(self, game):
             new_thread = threading.Thread(target=self.receive, args=(id(game),))

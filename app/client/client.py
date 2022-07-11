@@ -96,7 +96,7 @@ if __name__ == "__main__":
         start_screen.show(game)
 
     game.state = CONNECT_TO_SERVER_STATE
-    my_player = game.network.connect(game)
+    my_player = game.network.connect()
 
     if(my_player.pid == 0):
         game.map = settings_screen.show(game)
