@@ -63,7 +63,7 @@ class Player(pg.sprite.Sprite):
     def explode(self, bullet):
         if self in self.game.all_sprites.sprites():
             pos = vec((self.pos[0] + bullet.pos[0])/2,(self.pos[1] + bullet.pos[1])/2) 
-            explosion = Explosion(self.game, pos)
+            explosion = Explosion(self.game, pos, self.pid)
             self.game.all_sprites.add(explosion)
             self.kill()
             bullet.kill()     

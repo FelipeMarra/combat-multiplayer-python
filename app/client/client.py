@@ -11,6 +11,8 @@ from app.client.midia import midia_loader
 from app.client.screens import start_screen, settings_screen, await_screen, game_over_screen
 from app.client.network import Network
 
+vec = pg.math.Vector2
+
 class Game(metaclass=SingletonMeta):
     def __init__(self):
         # Creating screem
@@ -62,6 +64,7 @@ class Game(metaclass=SingletonMeta):
                 self.is_running = False
 
     def reset(self):
+        print("Entrou no reset!")
         #clear bullets and players sprits
         for bullet in self.alliebullets:
             bullet.kill()
@@ -71,14 +74,14 @@ class Game(metaclass=SingletonMeta):
         self.my_player.kill()
 
         #get next start position
-        enemmy_start_position = self.my_player.start_position 
-        print(f"NEW ENEMMY POS {enemmy_start_position}")
+        #enemmy_start_position = self.my_player.start_position 
+        #print(f"NEW ENEMMY POS {enemmy_start_position}")
         self.my_player.start_position = (self.my_player.start_position + 1) % 2
         print(f"NEW MY P POS {self.my_player.start_position}")
 
         #update player position data
-        self.my_player.pos = POSITIONS[self.my_player.start_position]
-        self.enemy_player.pos = POSITIONS[enemmy_start_position]
+        self.my_player.pos = vec(POSITIONS[self.my_player.start_position])
+        #self.enemy_player.pos = vec(POSITIONS[enemmy_start_position])
 
         #add player data to screen
         self.all_sprites.add(self.my_player)
