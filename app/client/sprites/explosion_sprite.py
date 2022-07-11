@@ -3,8 +3,9 @@ import pygame as pg
 from app import *
 
 class Explosion(pg.sprite.Sprite):
-    def __init__(self, game, pos):
+    def __init__(self, game, pos, pid):
         pg.sprite.Sprite.__init__(self)
+        self.pid = pid
         self.game = game
         self.pos = pos
         self.images = []	
@@ -38,3 +39,6 @@ class Explosion(pg.sprite.Sprite):
 		#if the animation is complete, reset animation index
         if self.index >= len(self.images) - 1 and self.counter >= EXPLOSION_SPEED:
             self.kill()
+            if self.pid != self.game.my_player.pid:
+                self.game.network.send_game_reset()
+            

@@ -81,4 +81,5 @@ class Bullet(pg.sprite.Sprite):
 
         if pg.sprite.spritecollide(self.game.my_player, self.game.enemybullets, False):
             self.game.my_player.explode(bullet=self)
-            self.game.network.send_game_reset()
+            
+            
