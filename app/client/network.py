@@ -41,18 +41,18 @@ class Network():
 
     #Envia para o servidor o comando que pede quantos jogadores estão prontos e retorna a resposta
     def get_game_is_ready(self, game):
-        #try:
+        #TODO CONFLITO SEND/RECEIVE => MUDAR TODOS OS RECEIVE PRO MESMO LUGAR
+        try:
             self.client.send(pickle.dumps(Command(GET_GAME_IS_READY)))
             data = self.client.recv(BUFFER_SIZE)
             game_map = pickle.loads(data)
-            if(type(game_map) == int):
-                print(f"1 PLAYER {self.my_player_data.pid} RECEBEU O MAPA {game.map}")
-                game.map = game_map
+            print(f"1 PLAYER {self.my_player_data.pid} RECEBEU O MAPA {game.map}")
+            game.map = game_map
             return True if game_map != -1 else False
-        # except:
-        #     print(f"Error getting if game is ready")
-        #     self.client.close()
-        #     quit()
+        except:
+            print(f"Error getting if game is ready")
+            self.client.close()
+            quit()
 
     def send_pid_is_ready(self):
         self.client.send(pickle.dumps(Command(POST_PID_IS_READY, self.my_player_data.pid)))
@@ -62,28 +62,28 @@ class Network():
 
     def send_game_reset(self):
         self.client.send(pickle.dumps(Command(POST_GAME_RESET, self.my_player_data.pid)))
+    
+    def send_bullet_data(self, bullet_data):
+        self.client.send(pickle.dumps(bullet_data))
+    
+    def send_player_data(self, bullet_data):
+        self.client.send(pickle.dumps(bullet_data))
 
     def start_enemy(self):
+        #TODO CONFLITO SEND/RECEIVE => MUDAR TODOS OS RECEIVE PRO MESMO LUGAR
         self.client.send(pickle.dumps(Command(GET_INTIAL_ENEMY_PLAYER)))
         data = self.client.recv(BUFFER_SIZE)
         enemy = pickle.loads(data)
-        print(f"PLAYER {self.my_player_data.pid} recebeu {enemy}")
-        print(f"PLAYER {self.my_player_data.pid} recebeu {enemy.pid}")
+        print(f"start_enemy: PLAYER {self.my_player_data.pid} recebeu {enemy}")
         return enemy
-
-    def send(self, server_pkt):
-        try:
-            self.client.send(pickle.dumps(server_pkt))
-        except error:
-            print(f"Error sending pkt type {type(error)}")
 
     def receive(self, game):
         game = ctypes.cast(game, ctypes.py_object).value
         while True:
-            #try:
+            try:
                 data = self.client.recv(BUFFER_SIZE)
                 if data:
-            
+
                     try:
                         server_pkt = pickle.loads(data)
                     except:
@@ -91,15 +91,9 @@ class Network():
                         pass
 
                     if type(server_pkt) is PlayerData:
-                        #TODO UPDATE
                         game.network.enemy_player_data = server_pkt
-                        game.enemy_player.pos = game.network.enemy_player_data.pos
-                        game.enemy_player.vel = game.network.enemy_player_data.vel
-                        game.enemy_player.acc = game.network.enemy_player_data.acc
-                        game.enemy_player.angle = game.network.enemy_player_data.angle
-                        game.enemy_player.rect.center = game.enemy_player.pos
-                        game.enemy_player.rotate(game.enemy_player.angle)
-                    
+                        game.enemy_player.update_enemy()
+
                     if type(server_pkt) is BulletData:
                         b = Bullet(game, server_pkt.pos, server_pkt.dir, server_pkt.dx, server_pkt.dy, server_pkt.pid)
                         
@@ -109,10 +103,10 @@ class Network():
                             game.enemybullets.add(b)
                         
                         game.all_sprites.add(b)
-                    
+
                     if type(server_pkt) is Command:
                         if(server_pkt.type == POST_GAME_RESET):
                             game.reset()
 
-            # except error:
-            #     print(f"Error on network receive")
+            except error:
+                print(f"Error on network receive")
