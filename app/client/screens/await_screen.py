@@ -14,7 +14,7 @@ def show(game):
     while waiting:
         game.timer.tick(120)
 
-        if game.network.get_game_is_ready(game):
+        if game.state == TRADE_UPDATES_STATE:
             print(f"2 PLAYER {game.network.my_player_data.pid} RECEBEU O MAPA {game.map}")
             waiting = False
             return

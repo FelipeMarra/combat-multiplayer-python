@@ -1,5 +1,4 @@
 import sys
-import threading
 
 import pygame
 
@@ -26,12 +25,13 @@ class Game(metaclass=SingletonMeta):
         self.font = pygame.font.match_font(TEXT_FONT)
         midia_loader.load_files(self)
         self.network = Network(SERVER_IP, SERVER_PORT)
+        self.state = INITIAL_STATE
 
     def new_game(self):
         # intanciating sprites
         self.all_sprites = pygame.sprite.Group()
         p_data = self.network.my_player_data
-        enemy_data = self.network.start_enemy()
+        enemy_data = self.network.enemy_player_data
         self.my_player = Player(self, p_data, True)
         self.enemy_player = Player(self, enemy_data, False)
         self.alliebullets = pygame.sprite.Group()
@@ -43,12 +43,8 @@ class Game(metaclass=SingletonMeta):
         self.moscou_song.play(-1)
 
     def run(self):
-        #sercer data receiving loop
-        new_thread = threading.Thread(target=self.network.receive, args=(id(self),))
-        new_thread.start()
         # game loop
-        self.playing = True
-        while self.playing:
+        while self.state != END_STATE:
             self.dt = self.timer.tick(FPS) / 1000.0
             self.events()
             update_sprites(self)
@@ -59,8 +55,8 @@ class Game(metaclass=SingletonMeta):
         # defines games events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                if self.playing:
-                    self.playing = False
+                if self.state != END_STATE:
+                    self.state = END_STATE
                 self.is_running = False
 
     def reset(self):
@@ -99,14 +95,19 @@ if __name__ == "__main__":
     if(test_mode != "True"):
         start_screen.show(game)
 
-    my_player = game.network.connect()
+    game.state = CONNECT_TO_SERVER_STATE
+    my_player = game.network.connect(game)
 
     if(my_player.pid == 0):
         game.map = settings_screen.show(game)
+        game.state = AWAIT_PLAYERS_STATE
+        game.network.start_receive(game)
         game.network.send_selected_map(game.map)
         await_screen.show(game)
 
     if(my_player.pid == 1):
+        game.state = GET_MAP_STATE
+        game.network.start_receive(game)
         await_screen.show(game)
 
     while game.is_running:

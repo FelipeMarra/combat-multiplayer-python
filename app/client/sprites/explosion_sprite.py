@@ -39,6 +39,5 @@ class Explosion(pg.sprite.Sprite):
 		#if the animation is complete, reset animation index
         if self.index >= len(self.images) - 1 and self.counter >= EXPLOSION_SPEED:
             self.kill()
-            if self.pid != self.game.my_player.pid:
+            if self.pid == self.game.my_player.pid:
                 self.game.network.send_game_reset()
-            

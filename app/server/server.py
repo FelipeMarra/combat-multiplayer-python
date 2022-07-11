@@ -67,13 +67,12 @@ class Server:
             player = PlayerData(pid, PLAYER_POSITION_1)
             self.initial_player_data.append(player)
             client_socket.send(pickle.dumps(player))
-            self.ready_players.append(pid)
+            self.ready_players.append(player)
             print("Player 1 is ready")
             #send to first player that a new player entered the game
             self.players_sockets[0].send(pickle.dumps(player))
             print("Game Started!!!")
 
-        #Se já ta rolando aquele joguin brabo
         while True:
             try:
                 data = client_socket.recv(BUFFER_SIZE)
@@ -89,26 +88,29 @@ class Server:
 
                         #if its not a class is a string command 
                         elif type(server_pkt) is Command:
-                            if(server_pkt.type == GET_INTIAL_ENEMY_PLAYER):
-                                other_player = (pid + 1) % 2
-                                print(f"{pid} SENDING OTHER PLAYER DATA ({self.initial_player_data[other_player]}) TO {other_player}")
-                                client_socket.send(pickle.dumps(self.initial_player_data[other_player]))
+                            #Game Map
+                            if(server_pkt.type == POST_GAME_MAP):
+                                print(f"Player {server_pkt.data} selecionou o mapa {server_pkt.data}")
+                                self.game_map = server_pkt.data
 
-                            #command to know how many players are ready
-                            if(server_pkt.type == GET_GAME_IS_READY):
-                                if len(self.ready_players) == N_PLAYERS and self.game_map != -1:
-                                    client_socket.send(pickle.dumps(self.game_map))
-                                else:
-                                    client_socket.send(pickle.dumps(-1))
+                            if(server_pkt.type == GET_GAME_MAP):
+                                client_socket.send(pickle.dumps(self.game_map))
+
+                            #Game Ready
+                            if(server_pkt.type == GET_READY_PLAYERS):
+                                client_socket.send(pickle.dumps(self.ready_players))
 
                             if(server_pkt.type == POST_PID_IS_READY):
                                 print(f"Player {server_pkt.data} disse que esta pronto")
                                 pickle.dumps(self.ready_players.append(server_pkt.data))
 
-                            if(server_pkt.type == POST_GAME_MAP):
-                                print(f"Player {server_pkt.data} selecionou o mapa {server_pkt.data}")
-                                self.game_map = server_pkt.data
+                            #Get other players
+                            if(server_pkt.type == GET_INTIAL_ENEMY_PLAYER):
+                                other_player = (pid + 1) % 2
+                                print(f"{pid} SENDING OTHER PLAYER DATA ({self.initial_player_data[other_player]}) TO {other_player}")
+                                client_socket.send(pickle.dumps(self.initial_player_data[other_player]))
 
+                            #Game reset
                             if(server_pkt.type == POST_GAME_RESET):
                                 self.send_all(server_pkt)
 

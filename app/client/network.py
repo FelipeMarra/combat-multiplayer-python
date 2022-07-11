@@ -1,7 +1,8 @@
 from socket import *
 import ctypes
-
 import pickle
+
+import threading
 
 from app.server_models import *
 from app.global_constants import *
@@ -17,7 +18,7 @@ class Network():
         self.enemy_player_data = None
 
     #Conecta ao servidor e recebe pacote correspondente ao jogador
-    def connect(self):
+    def connect(self, game):
         try:
             #conexão
             self.client.settimeout(5)
@@ -33,29 +34,15 @@ class Network():
             my_player = pickle.loads(self.client.recv(BUFFER_SIZE))
             print(f"Received initial player obj pid: {my_player.pid}")
             self.my_player_data = my_player
+
             return my_player
         except:
             print(f"Error receiving intial player data")
             self.client.close()
             quit()
 
-    #Envia para o servidor o comando que pede quantos jogadores estão prontos e retorna a resposta
-    def get_game_is_ready(self, game):
-        #TODO CONFLITO SEND/RECEIVE => MUDAR TODOS OS RECEIVE PRO MESMO LUGAR
-        try:
-            self.client.send(pickle.dumps(Command(GET_GAME_IS_READY)))
-            data = self.client.recv(BUFFER_SIZE)
-            game_map = pickle.loads(data)
-            print(f"1 PLAYER {self.my_player_data.pid} RECEBEU O MAPA {game.map}")
-            game.map = game_map
-            return True if game_map != -1 else False
-        except:
-            print(f"Error getting if game is ready")
-            self.client.close()
-            quit()
-
     def send_pid_is_ready(self):
-        self.client.send(pickle.dumps(Command(POST_PID_IS_READY, self.my_player_data.pid)))
+        self.client.send(pickle.dumps(Command(POST_PID_IS_READY, self.my_player_data)))
     
     def send_selected_map(self, selected_map):
         self.client.send(pickle.dumps(Command(POST_GAME_MAP, selected_map)))
@@ -69,44 +56,72 @@ class Network():
     def send_player_data(self, bullet_data):
         self.client.send(pickle.dumps(bullet_data))
 
-    def start_enemy(self):
-        #TODO CONFLITO SEND/RECEIVE => MUDAR TODOS OS RECEIVE PRO MESMO LUGAR
-        self.client.send(pickle.dumps(Command(GET_INTIAL_ENEMY_PLAYER)))
+    def get_data(self):
         data = self.client.recv(BUFFER_SIZE)
-        enemy = pickle.loads(data)
-        print(f"start_enemy: PLAYER {self.my_player_data.pid} recebeu {enemy}")
-        return enemy
+        if data:
+            try:
+                return pickle.loads(data)
+            except:
+                #Pickle raises exception when moving game window borders
+                pass
+
+    def start_receive(self, game):
+            new_thread = threading.Thread(target=self.receive, args=(id(game),))
+            new_thread.start()
 
     def receive(self, game):
         game = ctypes.cast(game, ctypes.py_object).value
-        while True:
-            try:
+        while game.state != END_STATE:
+            if(game.state == GET_MAP_STATE):
+                print("SELECT MAP STATE")
+
+                self.client.send(pickle.dumps(Command(GET_GAME_MAP)))
                 data = self.client.recv(BUFFER_SIZE)
-                if data:
+                game_map = pickle.loads(data)
 
-                    try:
+                if(type(game_map) == int):
+                    if(game_map != -1):
+                        game.map = game_map
+                        print(f"PLAYER {self.my_player_data.pid} RECEBEU O MAPA {game.map}")
+                        game.state = AWAIT_PLAYERS_STATE
+
+            if(game.state == AWAIT_PLAYERS_STATE):
+                print("AWAIT_PLAYERS_STATE")
+
+                self.client.send(pickle.dumps(Command(GET_READY_PLAYERS)))
+                data = self.client.recv(BUFFER_SIZE)
+                players = pickle.loads(data)
+
+                if(type(players) == list):
+                    print(f"RECEBEU PLAYERS {players}")
+                    if(len(players) == N_PLAYERS):
+                        print(f"PLAYER {self.my_player_data.pid} SAID GAME IS READY")
+                        self.enemy_player_data = [x for x in players if x.pid != self.my_player_data.pid][0]
+                        game.state = TRADE_UPDATES_STATE
+
+            if(game.state == TRADE_UPDATES_STATE):
+                try:
+                    data = self.client.recv(BUFFER_SIZE)
+
+                    if data:
                         server_pkt = pickle.loads(data)
-                    except:
-                        #Pickle raises exception when moving game window borders
-                        pass
-
-                    if type(server_pkt) is PlayerData:
-                        game.network.enemy_player_data = server_pkt
-                        game.enemy_player.update_enemy()
-
-                    if type(server_pkt) is BulletData:
-                        b = Bullet(game, server_pkt.pos, server_pkt.dir, server_pkt.dx, server_pkt.dy, server_pkt.pid)
                         
-                        if server_pkt.pid == game.my_player.pid:
-                            game.alliebullets.add(b)
-                        else:
-                            game.enemybullets.add(b)
-                        
-                        game.all_sprites.add(b)
+                        if type(server_pkt) is PlayerData:
+                            game.network.enemy_player_data = server_pkt
+                            game.enemy_player.update_enemy()
 
-                    if type(server_pkt) is Command:
-                        if(server_pkt.type == POST_GAME_RESET):
-                            game.reset()
+                        if type(server_pkt) is BulletData:
+                            b = Bullet(game, server_pkt.pos, server_pkt.dir, server_pkt.dx, server_pkt.dy, server_pkt.pid)
+                            
+                            if server_pkt.pid == game.my_player.pid:
+                                game.alliebullets.add(b)
+                            else:
+                                game.enemybullets.add(b)
+                            
+                            game.all_sprites.add(b)
 
-            except error:
-                print(f"Error on network receive")
+                        if type(server_pkt) is Command:
+                            if(server_pkt.type == POST_GAME_RESET):
+                                game.reset()
+                except:
+                    print("ERROR RECEIVING ON TRADING STATE")
