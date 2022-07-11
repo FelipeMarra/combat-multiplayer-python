@@ -68,7 +68,7 @@ class Server:
             self.initial_player_data.append(player)
             client_socket.send(pickle.dumps(player))
             self.ready_players.append(pid)
-            print("Player 1 be ready")
+            print("Player 1 is ready")
             #send to first player that a new player entered the game
             self.players_sockets[0].send(pickle.dumps(player))
             print("Game Started!!!")
@@ -91,6 +91,7 @@ class Server:
                         elif type(server_pkt) is Command:
                             if(server_pkt.type == GET_INTIAL_ENEMY_PLAYER):
                                 other_player = (pid + 1) % 2
+                                print(f"{pid} SENDING OTHER PLAYER DATA ({self.initial_player_data[other_player]}) TO {other_player}")
                                 client_socket.send(pickle.dumps(self.initial_player_data[other_player]))
 
                             #command to know how many players are ready

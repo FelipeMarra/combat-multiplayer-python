@@ -41,7 +41,7 @@ class Network():
 
     #Envia para o servidor o comando que pede quantos jogadores estão prontos e retorna a resposta
     def get_game_is_ready(self, game):
-        try:
+        #try:
             self.client.send(pickle.dumps(Command(GET_GAME_IS_READY)))
             data = self.client.recv(BUFFER_SIZE)
             game_map = pickle.loads(data)
@@ -49,10 +49,10 @@ class Network():
                 print(f"1 PLAYER {self.my_player_data.pid} RECEBEU O MAPA {game.map}")
                 game.map = game_map
             return True if game_map != -1 else False
-        except:
-            print(f"Error getting if game is ready")
-            self.client.close()
-            quit()
+        # except:
+        #     print(f"Error getting if game is ready")
+        #     self.client.close()
+        #     quit()
 
     def send_pid_is_ready(self):
         self.client.send(pickle.dumps(Command(POST_PID_IS_READY, self.my_player_data.pid)))
@@ -67,6 +67,8 @@ class Network():
         self.client.send(pickle.dumps(Command(GET_INTIAL_ENEMY_PLAYER)))
         data = self.client.recv(BUFFER_SIZE)
         enemy = pickle.loads(data)
+        print(f"PLAYER {self.my_player_data.pid} recebeu {enemy}")
+        print(f"PLAYER {self.my_player_data.pid} recebeu {enemy.pid}")
         return enemy
 
     def send(self, server_pkt):
@@ -78,7 +80,7 @@ class Network():
     def receive(self, game):
         game = ctypes.cast(game, ctypes.py_object).value
         while True:
-            try:
+            #try:
                 data = self.client.recv(BUFFER_SIZE)
                 if data:
             
@@ -112,5 +114,5 @@ class Network():
                         if(server_pkt.type == POST_GAME_RESET):
                             game.reset()
 
-            except error:
-                print(f"Error on network receive")
+            # except error:
+            #     print(f"Error on network receive")
