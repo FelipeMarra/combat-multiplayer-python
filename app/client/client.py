@@ -86,7 +86,7 @@ class Game(metaclass=SingletonMeta):
 if __name__ == "__main__":
     test_mode = "False"
     file, server_ip, server_port, test_mode = sys.argv
-    
+
     SERVER_IP = server_ip
     SERVER_PORT = int(server_port)
 

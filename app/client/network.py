@@ -43,16 +43,16 @@ class Network():
 
     def send_pid_is_ready(self):
         self.client.send(pickle.dumps(Command(POST_PID_IS_READY, self.my_player_data)))
-    
+
     def send_selected_map(self, selected_map):
         self.client.send(pickle.dumps(Command(POST_GAME_MAP, selected_map)))
 
     def send_game_reset(self):
         self.client.send(pickle.dumps(Command(POST_GAME_RESET, self.my_player_data.pid)))
-    
+
     def send_bullet_data(self, bullet_data):
         self.client.send(pickle.dumps(bullet_data))
-    
+
     def send_player_data(self, bullet_data):
         self.client.send(pickle.dumps(bullet_data))
 
@@ -103,12 +103,12 @@ class Network():
 
                         if type(server_pkt) is BulletData:
                             b = Bullet(game, server_pkt.pos, server_pkt.dir, server_pkt.dx, server_pkt.dy, server_pkt.pid)
-                            
+
                             if server_pkt.pid == game.my_player.pid:
                                 game.alliebullets.add(b)
                             else:
                                 game.enemybullets.add(b)
-                            
+
                             game.all_sprites.add(b)
 
                         if type(server_pkt) is Command:
