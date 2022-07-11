@@ -44,11 +44,11 @@ class Network():
         try:
             self.client.send(pickle.dumps(Command(GET_GAME_IS_READY)))
             data = self.client.recv(BUFFER_SIZE)
-            if(data):
-                game_map = pickle.loads(data)
-                if(type(game_map) == int):
-                    game.map = game_map
-                return True if game_map != -1 else False
+            game_map = pickle.loads(data)
+            if(type(game_map) == int):
+                print(f"1 PLAYER {self.my_player_data.pid} RECEBEU O MAPA {game.map}")
+                game.map = game_map
+            return True if game_map != -1 else False
         except:
             print(f"Error getting if game is ready")
             self.client.close()
@@ -63,13 +63,11 @@ class Network():
     def send_game_reset(self):
         self.client.send(pickle.dumps(Command(POST_GAME_RESET, self.my_player_data.pid)))
 
-    def start_enemy(self, server_pkt):
-        try:
-            self.client.send(pickle.dumps(server_pkt))
-            #In case we're sending our player update for the first time we want to get others back
-            return pickle.loads(self.client.recv(BUFFER_SIZE))
-        except error:
-            print(f"Error sending pkt type {type(error)}")
+    def start_enemy(self):
+        self.client.send(pickle.dumps(Command(GET_INTIAL_ENEMY_PLAYER)))
+        data = self.client.recv(BUFFER_SIZE)
+        enemy = pickle.loads(data)
+        return enemy
 
     def send(self, server_pkt):
         try:
@@ -91,6 +89,7 @@ class Network():
                         pass
 
                     if type(server_pkt) is PlayerData:
+                        #TODO UPDATE
                         game.network.enemy_player_data = server_pkt
                         game.enemy_player.pos = game.network.enemy_player_data.pos
                         game.enemy_player.vel = game.network.enemy_player_data.vel
