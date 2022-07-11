@@ -10,6 +10,7 @@ class Server:
     def __init__(self):
         self.players_sockets = []
         self.ready_players = []
+        self.initial_player_data = []
         self.game_map = -1
         self.serverSocket = None
     
@@ -57,12 +58,14 @@ class Server:
         if(pid == 0):
             print(f"Client {addr} started a new game.")
             player = PlayerData(pid, PLAYER_POSITION_0)
+            self.initial_player_data.append(player)
             client_socket.send(pickle.dumps(player))
             print("Awaiting next player")
         #If there is another player pid is 1
         elif(pid == 1):
             print(f"Client {addr} entered the game.")
             player = PlayerData(pid, PLAYER_POSITION_1)
+            self.initial_player_data.append(player)
             client_socket.send(pickle.dumps(player))
             self.ready_players.append(pid)
             print("Player 1 be ready")
@@ -86,6 +89,10 @@ class Server:
 
                         #if its not a class is a string command 
                         elif type(server_pkt) is Command:
+                            if(server_pkt.type == GET_INTIAL_ENEMY_PLAYER):
+                                other_player = (pid + 1) % 2
+                                client_socket.send(pickle.dumps(self.initial_player_data[other_player]))
+
                             #command to know how many players are ready
                             if(server_pkt.type == GET_GAME_IS_READY):
                                 if len(self.ready_players) == N_PLAYERS and self.game_map != -1:
