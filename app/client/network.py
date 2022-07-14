@@ -48,7 +48,7 @@ class Network():
         self.client.send(pickle.dumps(Command(POST_GAME_MAP, selected_map)))
 
     def send_game_reset(self):
-        self.client.send(pickle.dumps(Command(POST_GAME_RESET, self.my_player_data.pid)))
+        self.client.send(pickle.dumps(Command(POST_GAME_RESET, (self.my_player_data.pid, self.my_player_data.life))))
 
     def send_bullet_data(self, bullet_data):
         self.client.send(pickle.dumps(bullet_data))
@@ -86,13 +86,13 @@ class Network():
                         game.state = TRADE_UPDATES_STATE
 
             if(game.state == TRADE_UPDATES_STATE):
-                try:
+                #try:
                     data = self.client.recv(BUFFER_SIZE)
 
                     if data:
                         server_pkt = pickle.loads(data)
                         
-                        if type(server_pkt) is PlayerData:
+                        if type(server_pkt) is PlayerData and game.enemy_player:
                             game.network.enemy_player_data = server_pkt
                             game.enemy_player.update_enemy()
 
@@ -108,6 +108,10 @@ class Network():
 
                         if type(server_pkt) is Command:
                             if(server_pkt.type == POST_GAME_RESET):
+                                if(server_pkt.data[0] != self.my_player_data.pid):
+                                    self.enemy_player_data.life = server_pkt.data[1]
+                                    game.enemy_player.life = server_pkt.data[1]
                                 game.reset()
-                except:
-                    print("ERROR RECEIVING ON TRADING STATE")
+                # except:
+                #     print("ERROR RECEIVING ON TRADING STATE")
+        print("MATOU A NETWORK")

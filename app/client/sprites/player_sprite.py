@@ -120,8 +120,9 @@ class Player(pg.sprite.Sprite):
     
     def update_enemy(self):
         self.game.enemy_player.pos = self.game.network.enemy_player_data.pos
+        self.game.enemy_player.rect.center = self.game.enemy_player.pos
         self.game.enemy_player.vel = self.game.network.enemy_player_data.vel
         self.game.enemy_player.acc = self.game.network.enemy_player_data.acc
         self.game.enemy_player.angle = self.game.network.enemy_player_data.angle
-        self.game.enemy_player.rect.center = self.game.enemy_player.pos
+        self.game.enemy_player.life =  self.game.network.enemy_player_data.life
         self.game.enemy_player.rotate(self.game.enemy_player.angle)

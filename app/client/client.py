@@ -60,6 +60,7 @@ class Game(metaclass=SingletonMeta):
                 self.is_running = False
 
     def reset(self):
+        print(f"PLayer PID {self.my_player.pid} LIFE {self.my_player.life} && PID {self.enemy_player.pid} LIFE {self.enemy_player.life}")
         #clear bullets and players sprits
         for bullet in self.alliebullets:
             bullet.kill()
@@ -112,4 +113,4 @@ if __name__ == "__main__":
     while game.is_running:
         game.new_game()
         game.run()
-        #TODO game_over_screen.show(game)
+        game_over_screen.show(game)

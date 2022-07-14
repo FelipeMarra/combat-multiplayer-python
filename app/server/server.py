@@ -112,6 +112,7 @@ class Server:
 
                             #Game reset
                             if(server_pkt.type == POST_GAME_RESET):
+                                print(f"{pid} SENT A RESET WITH LIFE = {server_pkt.data[1]}")
                                 self.send_all(server_pkt)
 
             except error:
