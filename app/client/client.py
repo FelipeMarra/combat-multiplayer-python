@@ -21,7 +21,6 @@ class Game():
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
         self.timer = pygame.time.Clock()
-        self.is_running = True
         self.font = pygame.font.match_font(TEXT_FONT)
         midia_loader.load_files(self)
         self.network = Network(SERVER_IP, SERVER_PORT)
@@ -55,9 +54,7 @@ class Game():
         # defines games events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                if self.state != END_STATE:
-                    self.state = END_STATE
-                self.is_running = False
+                self.state = END_STATE
 
     def reset(self):
         print(f"PLayer PID {self.my_player.pid} LIFE {self.my_player.life} && PID {self.enemy_player.pid} LIFE {self.enemy_player.life}")
@@ -89,8 +86,8 @@ if __name__ == "__main__":
     SERVER_IP = server_ip
     SERVER_PORT = int(server_port)
 
-    run_screen = True
-    while run_screen:
+    waiting = True
+    while waiting:
         game = Game()
 
         if(test_mode != "True"):
@@ -100,7 +97,8 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                run_screen = False
+                waiting = False
+                game.state = END_STATE
                 continue
 
         game.state = CONNECT_TO_SERVER_STATE
@@ -118,7 +116,6 @@ if __name__ == "__main__":
             game.network.start_receive(game)
             await_screen.show(game)
 
-        while game.is_running:
-            game.new_game()
-            game.run()
-            game_over_screen.show(game)
+        game.new_game()
+        game.run()
+        game_over_screen.show(game)

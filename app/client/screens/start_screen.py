@@ -18,7 +18,7 @@ def show(game):
             # await command
             if event.type == pygame.QUIT:
                 waiting = False
-                game.is_running = False
+                game.state = END_STATE
 
             if event.type == pygame.KEYUP:
                 game.beep_sound.play()

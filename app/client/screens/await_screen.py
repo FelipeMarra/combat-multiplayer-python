@@ -24,7 +24,7 @@ def show(game):
             # await command
             if event.type == pygame.QUIT:
                 waiting = False
-                game.is_running = False
+                game.state = END_STATE
 
             # blinking text
             if event.type == font_fade:

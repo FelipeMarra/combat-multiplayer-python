@@ -37,7 +37,7 @@ def show(game):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 waiting = False
-                game.is_running = False
+                game.state = END_STATE
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if map_1_button.checkForInput(mouse_position):
