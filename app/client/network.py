@@ -64,8 +64,6 @@ class Network():
         game = ctypes.cast(game, ctypes.py_object).value
         while game.state != END_STATE:
             if(game.state == GET_MAP_STATE):
-                print("SELECT MAP STATE")
-
                 self.client.send(pickle.dumps(Command(GET_GAME_MAP)))
                 data = self.client.recv(BUFFER_SIZE)
                 game_map = pickle.loads(data)
@@ -77,14 +75,11 @@ class Network():
                         game.state = AWAIT_PLAYERS_STATE
 
             if(game.state == AWAIT_PLAYERS_STATE):
-                print("AWAIT_PLAYERS_STATE")
-
                 self.client.send(pickle.dumps(Command(GET_READY_PLAYERS)))
                 data = self.client.recv(BUFFER_SIZE)
                 players = pickle.loads(data)
 
                 if(type(players) == list):
-                    print(f"RECEBEU PLAYERS {players}")
                     if(len(players) == N_PLAYERS):
                         print(f"PLAYER {self.my_player_data.pid} SAID GAME IS READY")
                         self.enemy_player_data = [x for x in players if x.pid != self.my_player_data.pid][0]

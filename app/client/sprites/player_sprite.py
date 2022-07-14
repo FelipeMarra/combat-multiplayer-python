@@ -14,6 +14,7 @@ class Player(pg.sprite.Sprite):
             self.image = self.game.player_image
         elif self.pid == 1:
             self.image = self.game.enemy_image
+        self.life = data.life
         self.original_image = self.image
         self.rect = self.image.get_rect()
         self.rect.center = data.pos
@@ -62,11 +63,11 @@ class Player(pg.sprite.Sprite):
     
     def explode(self, bullet):
         if self in self.game.all_sprites.sprites():
-            pos = vec((self.pos[0] + bullet.pos[0])/2,(self.pos[1] + bullet.pos[1])/2) 
+            pos = vec((self.pos[0] + bullet.pos[0])/2,(self.pos[1] + bullet.pos[1])/2)
             explosion = Explosion(self.game, pos, self.pid)
             self.game.all_sprites.add(explosion)
             self.kill()
-            bullet.kill()     
+            bullet.kill()
     
     def check_walls(self, direction):
         walls_hitten = pg.sprite.spritecollide(self, self.game.walls, False)
@@ -112,6 +113,7 @@ class Player(pg.sprite.Sprite):
             self.game.network.my_player_data.vel = self.vel
             self.game.network.my_player_data.acc = self.acc
             self.game.network.my_player_data.angle = angle
+            self.game.network.my_player_data.life = self.life
 
             #send update to server
             self.game.network.send_player_data(self.game.network.my_player_data)

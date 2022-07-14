@@ -14,7 +14,7 @@ class PlayerData():
         self.vel = (0, 0)
         self.acc = (0, 0)
         self.angle = 0
-        #TODO self.life = life
+        self.life = 3
 
 class BulletData():
     def __init__(self, pos, dir, dx, dy, pid):

@@ -60,7 +60,6 @@ class Game(metaclass=SingletonMeta):
                 self.is_running = False
 
     def reset(self):
-        print("Entrou no reset!")
         #clear bullets and players sprits
         for bullet in self.alliebullets:
             bullet.kill()
