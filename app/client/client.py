@@ -12,7 +12,7 @@ from app.client.network import Network
 
 vec = pg.math.Vector2
 
-class Game(metaclass=SingletonMeta):
+class Game():
     def __init__(self):
         # Creating screem
         pygame.init()
@@ -72,10 +72,7 @@ class Game(metaclass=SingletonMeta):
             game.state = END_STATE
 
         #get next start position
-        #enemmy_start_position = self.my_player.start_position 
-        #print(f"NEW ENEMMY POS {enemmy_start_position}")
         self.my_player.start_position = (self.my_player.start_position + 1) % 2
-        print(f"NEW MY P POS {self.my_player.start_position}")
 
         #update player position data
         self.my_player.pos = vec(POSITIONS[self.my_player.start_position])
@@ -92,27 +89,36 @@ if __name__ == "__main__":
     SERVER_IP = server_ip
     SERVER_PORT = int(server_port)
 
-    game = Game()
+    run_screen = True
+    while run_screen:
+        game = Game()
 
-    if(test_mode != "True"):
-        start_screen.show(game)
+        if(test_mode != "True"):
+            start_screen.show(game)
 
-    game.state = CONNECT_TO_SERVER_STATE
-    my_player = game.network.connect()
+        #check if user closed the scree
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                run_screen = False
+                continue
 
-    if(my_player.pid == 0):
-        game.map = settings_screen.show(game)
-        game.state = AWAIT_PLAYERS_STATE
-        game.network.start_receive(game)
-        game.network.send_selected_map(game.map)
-        await_screen.show(game)
+        game.state = CONNECT_TO_SERVER_STATE
+        my_player = game.network.connect()
 
-    if(my_player.pid == 1):
-        game.state = GET_MAP_STATE
-        game.network.start_receive(game)
-        await_screen.show(game)
+        if(my_player.pid == 0):
+            game.map = settings_screen.show(game)
+            game.state = AWAIT_PLAYERS_STATE
+            game.network.start_receive(game)
+            game.network.send_selected_map(game.map)
+            await_screen.show(game)
 
-    while game.is_running:
-        game.new_game()
-        game.run()
-        game_over_screen.show(game)
+        if(my_player.pid == 1):
+            game.state = GET_MAP_STATE
+            game.network.start_receive(game)
+            await_screen.show(game)
+
+        while game.is_running:
+            game.new_game()
+            game.run()
+            game_over_screen.show(game)

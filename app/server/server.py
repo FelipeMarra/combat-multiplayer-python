@@ -1,3 +1,4 @@
+import logging
 import sys
 from socket import *
 import threading
@@ -13,7 +14,14 @@ class Server:
         self.initial_player_data = []
         self.game_map = -1
         self.serverSocket = None
-    
+
+    def clear(self):
+        print("SERVER WAS CLEARED")
+        self.players_sockets.clear()
+        self.ready_players.clear()
+        self.initial_player_data.clear()
+        self.game_map = -1
+
     def send_all(self, server_pkt):
         for player_socket in self.players_sockets:
             player_socket.send(pickle.dumps(server_pkt))
@@ -29,14 +37,13 @@ class Server:
             server_socket = socket(AF_INET, SOCK_STREAM)
             server_socket.bind(("", int(server_port)))
             server_socket.listen(1)
-            print(f"Server ready at port {server_port}, {gethostbyname(gethostname())}")
-            print()
+            print(f"SERVER READY AT PORT {server_port}, {gethostbyname(gethostname())}")
 
             self.serverSocket = server_socket;
 
             self.handle_connections()
-        except:
-            raise Exception("Can't create server")
+        except BaseException:
+            logging.exception(f"Error on start server:")
 
     def handle_connections(self):
         while True:
@@ -44,34 +51,34 @@ class Server:
             if(len(self.players_sockets) <= 1):
                 try:
                     clientSocket, addr = self.serverSocket.accept()
-                except:
-                    print("Error accepting")
+                except BaseException:
+                    logging.exception(f"Error accepting {addr}:")
                     quit()
 
                 new_thread = threading.Thread(target=self.listen_client, args=(clientSocket, addr, len(self.players_sockets)))
                 new_thread.start()
 
                 self.players_sockets.append(clientSocket)
-                
+
     def listen_client(self, client_socket, addr, pid):
         #If there's no other player pid is 0
         if(pid == 0):
-            print(f"Client {addr} started a new game.")
+            print(f"CLIENT {addr} STARTED A NEW GAME.")
             player = PlayerData(pid, PLAYER_POSITION_0)
             self.initial_player_data.append(player)
             client_socket.send(pickle.dumps(player))
-            print("Awaiting next player")
+            print("AWAITING NEXT PLAYER")
         #If there is another player pid is 1
         elif(pid == 1):
-            print(f"Client {addr} entered the game.")
+            print(f"CLIENT {addr} ENTERED THE GAME.")
             player = PlayerData(pid, PLAYER_POSITION_1)
             self.initial_player_data.append(player)
             client_socket.send(pickle.dumps(player))
             self.ready_players.append(player)
-            print("Player 1 is ready")
+            print("PLYER 1 IS READY")
             #send to first player that a new player entered the game
             self.players_sockets[0].send(pickle.dumps(player))
-            print("Game Started!!!")
+            print("GAME STARTED!!!")
 
         while True:
             try:
@@ -90,7 +97,7 @@ class Server:
                         elif type(server_pkt) is Command:
                             #Game Map
                             if(server_pkt.type == POST_GAME_MAP):
-                                print(f"Player {server_pkt.data} selecionou o mapa {server_pkt.data}")
+                                print(f"PLAYER {server_pkt.data} SELECTED MAP {server_pkt.data}")
                                 self.game_map = server_pkt.data
 
                             if(server_pkt.type == GET_GAME_MAP):
@@ -101,28 +108,35 @@ class Server:
                                 client_socket.send(pickle.dumps(self.ready_players))
 
                             if(server_pkt.type == POST_PID_IS_READY):
-                                print(f"Player {server_pkt.data} disse que esta pronto")
+                                print(f"PLAYER {server_pkt.data.pid} IS READY")
                                 pickle.dumps(self.ready_players.append(server_pkt.data))
 
                             #Get other players
                             if(server_pkt.type == GET_INTIAL_ENEMY_PLAYER):
                                 other_player = (pid + 1) % 2
-                                print(f"{pid} SENDING OTHER PLAYER DATA ({self.initial_player_data[other_player]}) TO {other_player}")
+                                print(f"{pid} GET_INTIAL_ENEMY_PLAYER: ({self.initial_player_data[other_player].pid})")
                                 client_socket.send(pickle.dumps(self.initial_player_data[other_player]))
 
                             #Game reset
                             if(server_pkt.type == POST_GAME_RESET):
                                 print(f"{pid} SENT A RESET WITH LIFE = {server_pkt.data[1]}")
                                 self.send_all(server_pkt)
+                                #If a player have lost disconect all to reset the game
+                                if(server_pkt.data[1] == 0):
+                                    break
 
-            except error:
-                print(f"Erro ao ouvir cliente {addr}: {type(error)}: {error.args}")
+            except BaseException:
+                logging.exception(f"Error listening to client {addr}:")
                 break
+
         #If one player goes off, all of them must go off too
-        #TODO THIS PART IS NOT WORKING
         for socket in self.players_sockets:
-            socket.close()
-        self.players_sockets.clear()
+            try:
+                socket.close()
+            except:
+                pass
+
+        self.clear()
 
 
 if __name__ == "__main__":

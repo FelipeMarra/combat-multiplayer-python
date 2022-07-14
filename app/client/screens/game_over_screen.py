@@ -37,6 +37,7 @@ def show(game):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if map_1_button.checkForInput(mouse_position):
                     waiting = False
-                    return 1
+                    game.is_running = False
+                    return
 
         pygame.display.update()
