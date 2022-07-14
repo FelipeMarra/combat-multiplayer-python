@@ -22,7 +22,7 @@ def show(game):
         PLAY_RECT = PLAY_TEXT.get_rect(center=(640, 260))
         SCREEN.blit(PLAY_TEXT, PLAY_RECT)
 
-        map_1_button = screen.Button(image=None, pos=(200, 460), text_input="Go To Initial Screen", 
+        map_1_button = screen.Button(image=None, pos=(640, 460), text_input="Go To Initial Screen", 
                                 font=get_font(game, 75), base_color="White", hovering_color="Red")
 
         map_1_button.changeColor(mouse_position)
@@ -37,7 +37,6 @@ def show(game):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if map_1_button.checkForInput(mouse_position):
                     waiting = False
-                    game.state = END_STATE
                     return 1
 
         pygame.display.update()

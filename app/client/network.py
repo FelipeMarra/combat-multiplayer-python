@@ -92,7 +92,7 @@ class Network():
                     if data:
                         server_pkt = pickle.loads(data)
                         
-                        if type(server_pkt) is PlayerData and game.enemy_player:
+                        if type(server_pkt) is PlayerData and hasattr(game, 'enemy_player'):
                             game.network.enemy_player_data = server_pkt
                             game.enemy_player.update_enemy()
 

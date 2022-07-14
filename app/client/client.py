@@ -68,6 +68,8 @@ class Game(metaclass=SingletonMeta):
             bullet.kill()
         self.enemy_player.kill()
         self.my_player.kill()
+        if(self.my_player.life == 0 or self.enemy_player.life == 0):
+            game.state = END_STATE
 
         #get next start position
         #enemmy_start_position = self.my_player.start_position 
