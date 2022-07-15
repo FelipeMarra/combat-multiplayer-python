@@ -132,7 +132,9 @@ class Network():
                                     self.enemy_player_data.life = server_pkt.data[1]
                                     game.enemy_player.life = server_pkt.data[1]
                                 game.reset()
+
                 except BaseException:
                     logging.exception(f"ERROR receiving on TRADE_UPDATES_STATE:")
         print("CLOSED NETWORK CONNECTION")
         self.client.close()
+
