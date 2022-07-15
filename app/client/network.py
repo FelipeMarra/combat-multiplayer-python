@@ -43,6 +43,7 @@ class Network():
             quit()
 
     def send_w_pickle(self, data):
+        #TODO Descomentar
         #try:
             self.client.send(pickle.dumps(data))
             if type(data) is Command:
@@ -92,6 +93,7 @@ class Network():
                             game.state = AWAIT_PLAYERS_STATE
                 except BaseException:
                     logging.exception(f"ERROR receiving on GET_MAP_STATE:")
+                #TODO remove
                 time.sleep(1)
 
             if(game.state == AWAIT_PLAYERS_STATE):
@@ -108,6 +110,7 @@ class Network():
                             game.state = TRADE_UPDATES_STATE
                 except BaseException:
                     logging.exception(f"ERROR receiving on AWAIT_PLAYERS_STATE:")
+                #TODO remove
                 time.sleep(1)
 
             if(game.state == TRADE_UPDATES_STATE):
