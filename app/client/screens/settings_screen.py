@@ -41,13 +41,11 @@ def show(game):
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if map_1_button.checkForInput(mouse_position):
-                    game.network.send_pid_is_ready()
                     waiting = False
                     return 1
 
 
                 if map_2_button.checkForInput(mouse_position):
-                    game.network.send_pid_is_ready()
                     waiting = False
                     return 2
 

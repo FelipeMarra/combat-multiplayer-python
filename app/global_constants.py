@@ -72,7 +72,6 @@ SERVER_PORT = -1
 #server/network commands
 #get asks the server an information
 GET_READY_PLAYERS = "GET READY_PLAYERS"
-GET_INTIAL_ENEMY_PLAYER = "GET INTIAL_ENEMY_PLAYER"
 GET_GAME_MAP = "GET GAME_MAP"
 #post sets a information on the server or client
 POST_GAME_MAP = "POST GAME_MAP"

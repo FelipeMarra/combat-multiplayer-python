@@ -2,7 +2,7 @@ import logging
 from socket import *
 import ctypes
 import pickle
-
+import time
 import threading
 
 from app.server_models import *
@@ -43,19 +43,22 @@ class Network():
             quit()
 
     def send_w_pickle(self, data):
-        try:
+        #try:
             self.client.send(pickle.dumps(data))
-        except BaseException:
-            logging.exception(f"ERROR on send_w_pickle:")
+            if type(data) is Command:
+                print(f"PICKLE ENVIOU {data.type}")
+        #except BaseException:
+        #    logging.exception(f"ERROR on send_w_pickle:")
 
     def send_pid_is_ready(self):
         self.send_w_pickle(Command(POST_PID_IS_READY, self.my_player_data))
 
     def send_selected_map(self, selected_map):
         self.send_w_pickle(Command(POST_GAME_MAP, selected_map))
+        print(f"FOI POSTADO O MAPA {selected_map}")
 
     def send_game_reset(self):
-        self.send_w_pickle(Command(POST_GAME_RESET, 
+        self.send_w_pickle(Command(POST_GAME_RESET,
                             (self.my_player_data.pid, self.my_player_data.life)))
 
     def send_bullet_data(self, bullet_data):
@@ -81,10 +84,15 @@ class Network():
                     if(type(game_map) == int):
                         if(game_map != -1):
                             game.map = game_map
-                            print(f"PLAYER {self.my_player_data.pid} RECEBEU O MAPA {game.map}")
+                            print(f"PLAYER {self.my_player_data.pid} RECEIVED MAP {game.map}")
+
+                            if(self.my_player_data.pid == 1):
+                                self.send_pid_is_ready()
+
                             game.state = AWAIT_PLAYERS_STATE
                 except BaseException:
                     logging.exception(f"ERROR receiving on GET_MAP_STATE:")
+                time.sleep(1)
 
             if(game.state == AWAIT_PLAYERS_STATE):
                 try:
@@ -92,6 +100,7 @@ class Network():
                     data = self.client.recv(BUFFER_SIZE)
                     players = pickle.loads(data)
 
+                    print(players)
                     if(type(players) == list):
                         if(len(players) == N_PLAYERS):
                             print(f"PLAYER {self.my_player_data.pid} SAID GAME IS READY")
@@ -99,6 +108,7 @@ class Network():
                             game.state = TRADE_UPDATES_STATE
                 except BaseException:
                     logging.exception(f"ERROR receiving on AWAIT_PLAYERS_STATE:")
+                time.sleep(1)
 
             if(game.state == TRADE_UPDATES_STATE):
                 try:

@@ -106,9 +106,13 @@ if __name__ == "__main__":
 
         if(my_player.pid == 0):
             game.map = settings_screen.show(game)
+
+            game.network.send_selected_map(game.map)
+            game.network.send_pid_is_ready()
+
             game.state = AWAIT_PLAYERS_STATE
             game.network.start_receive(game)
-            game.network.send_selected_map(game.map)
+
             await_screen.show(game)
 
         if(my_player.pid == 1):
