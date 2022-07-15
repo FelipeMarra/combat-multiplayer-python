@@ -96,8 +96,7 @@ class Game():
         self.screen.blit(enemy_hp_text, (450,70))
         
 if __name__ == "__main__":
-    test_mode = "False"
-    file, server_ip, server_port, test_mode = sys.argv
+    file, server_ip, server_port = sys.argv
 
     SERVER_IP = server_ip
     SERVER_PORT = int(server_port)
@@ -106,8 +105,7 @@ if __name__ == "__main__":
     while waiting:
         game = Game()
 
-        if(test_mode != "True"):
-            start_screen.show(game)
+        start_screen.show(game)
 
         #check if user closed the scree
         for event in pygame.event.get():
