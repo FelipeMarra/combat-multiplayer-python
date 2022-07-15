@@ -43,13 +43,10 @@ class Network():
             quit()
 
     def send_w_pickle(self, data):
-        #TODO Descomentar
-        #try:
+        try:
             self.client.send(pickle.dumps(data))
-            if type(data) is Command:
-                print(f"PICKLE ENVIOU {data.type}")
-        #except BaseException:
-        #    logging.exception(f"ERROR on send_w_pickle:")
+        except BaseException:
+            logging.exception(f"ERROR on send_w_pickle:")
 
     def send_pid_is_ready(self):
         self.send_w_pickle(Command(POST_PID_IS_READY, self.my_player_data))
@@ -93,8 +90,6 @@ class Network():
                             game.state = AWAIT_PLAYERS_STATE
                 except BaseException:
                     logging.exception(f"ERROR receiving on GET_MAP_STATE:")
-                #TODO remove
-                time.sleep(1)
 
             if(game.state == AWAIT_PLAYERS_STATE):
                 try:
@@ -102,7 +97,6 @@ class Network():
                     data = self.client.recv(BUFFER_SIZE)
                     players = pickle.loads(data)
 
-                    print(players)
                     if(type(players) == list):
                         if(len(players) == N_PLAYERS):
                             print(f"PLAYER {self.my_player_data.pid} SAID GAME IS READY")
@@ -110,8 +104,6 @@ class Network():
                             game.state = TRADE_UPDATES_STATE
                 except BaseException:
                     logging.exception(f"ERROR receiving on AWAIT_PLAYERS_STATE:")
-                #TODO remove
-                time.sleep(1)
 
             if(game.state == TRADE_UPDATES_STATE):
                 try:

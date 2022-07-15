@@ -88,7 +88,6 @@ class Server:
 
                         #if its not a class is a string command 
                         elif type(server_pkt) is Command:
-                            print(f"SERVER RECEIVED {server_pkt.type} from {pid}")
                             #Game Map
                             if(server_pkt.type == POST_GAME_MAP):
                                 print(f"PLAYER {pid} SELECTED MAP {server_pkt.data}")
@@ -99,7 +98,6 @@ class Server:
 
                             #Game Ready
                             if(server_pkt.type == GET_READY_PLAYERS):
-                                print(f"CHEGOU UM GET_READY_PLAYERS e eu respondi {self.ready_players}")
                                 client_socket.send(pickle.dumps(self.ready_players))
 
                             if(server_pkt.type == POST_PID_IS_READY):
