@@ -25,6 +25,10 @@ def load_files(game):
     game.choicemap = os.path.join(images_directory, CHOICEMAP)
     game.choicemap = pygame.image.load(game.choicemap).convert()
     game.choicemap = pygame.transform.scale(game.choicemap, (WIDTH, HEIGHT))
+    
+    game.waiting_image = os.path.join(images_directory, WAITING_IMAGE)
+    game.waiting_image = pygame.image.load(game.waiting_image).convert()
+    game.waiting_image = pygame.transform.scale(game.waiting_image, (WIDTH, HEIGHT))
       
 
     #pointer

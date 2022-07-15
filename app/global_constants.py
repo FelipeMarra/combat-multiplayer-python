@@ -21,6 +21,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
+PILLS = [RED, BLUE]
 COLORS = [RED, BLACK]
 INFO_COLORS = [BLACK, WHITE]
 
@@ -32,6 +33,8 @@ TANK_WALLPAPER = "tankwallpaper.png"
 START_BACKGROUND = "background.jpg"
 POINTER = "pointer_image.png"
 CHOICEMAP = "mapchoice.png"
+WAITING_IMAGE = "waiting_image.jpg"
+
 #Audios
 AOT_OPENING = 'aotopening.wav'
 MOSCOU_DEFENDER = 'moscoudefender.wav'
