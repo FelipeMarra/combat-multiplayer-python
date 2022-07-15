@@ -86,7 +86,7 @@ class Network():
                         game.state = TRADE_UPDATES_STATE
 
             if(game.state == TRADE_UPDATES_STATE):
-                #try:
+                try:
                     data = self.client.recv(BUFFER_SIZE)
 
                     if data:
@@ -112,6 +112,6 @@ class Network():
                                     self.enemy_player_data.life = server_pkt.data[1]
                                     game.enemy_player.life = server_pkt.data[1]
                                 game.reset()
-                # except:
-                #     print("ERROR RECEIVING ON TRADING STATE")
+                except:
+                    print("ERROR RECEIVING ON TRADING STATE")
         print("MATOU A NETWORK")

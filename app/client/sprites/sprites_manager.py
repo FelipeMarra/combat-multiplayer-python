@@ -20,4 +20,5 @@ def draw_sprites(game):
     game.pointerImg_rect = game.pointerImg.get_rect()
     game.pointerImg_rect.center = pygame.mouse.get_pos()
     game.screen.blit(game.pointerImg, game.pointerImg_rect)
+    game.show_info()
     pygame.display.flip()

@@ -9,6 +9,7 @@ def load_files(game):
     images_directory = os.path.join(os.getcwd(), "app/client/midia/images")
     game.audios_directory = os.path.join(os.getcwd(), "app/client/midia/audios")
     game.animation_directory = os.path.join(os.getcwd(), f"{images_directory}/boom")
+    game.morpheus_diretory = os.path.join(os.getcwd(), f"{images_directory}/morpheus")
     game.maps_directory = os.path.join(os.getcwd(), f"{images_directory}/maps")
     game.test_tank_sheet = os.path.join(images_directory, TEST_TANK_SHEET)
     game.test_map = os.path.join(images_directory, TEST_MAP_SHEET)
@@ -20,6 +21,11 @@ def load_files(game):
     game.start_background = os.path.join(images_directory, START_BACKGROUND)
     game.start_background = pygame.image.load(game.start_background).convert()
     game.start_background = pygame.transform.scale(game.start_background, (WIDTH, HEIGHT))
+    
+    game.choicemap = os.path.join(images_directory, CHOICEMAP)
+    game.choicemap = pygame.image.load(game.choicemap).convert()
+    game.choicemap = pygame.transform.scale(game.choicemap, (WIDTH, HEIGHT))
+      
 
     #pointer
     game.pointerImg = os.path.join(images_directory, POINTER)
@@ -47,6 +53,8 @@ def load_files(game):
     game.beep_sound = pygame.mixer.Sound(os.path.join(game.audios_directory, BEEP_SOUND))
     game.explosion_sound = pygame.mixer.Sound(os.path.join(game.audios_directory, EXPLOSION_SOUND))
     game.explosion_sound.set_volume(0.3)
+    game.morpheus = pygame.mixer.Sound(os.path.join(game.audios_directory, MORPHEUS_AUDIO))
+    game.morpheus.set_volume(0.5)
 
     # player
     game.player_image = pygame.image.load(os.path.join(images_directory, TANK_BLUE)).convert_alpha()

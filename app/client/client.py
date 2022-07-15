@@ -1,4 +1,5 @@
 import sys
+from tkinter import E
 
 import pygame
 
@@ -49,6 +50,7 @@ class Game(metaclass=SingletonMeta):
             self.events()
             update_sprites(self)
             draw_sprites(self)
+            
 
 
     def events(self):
@@ -82,7 +84,21 @@ class Game(metaclass=SingletonMeta):
         #add player data to screen
         self.all_sprites.add(self.my_player)
         self.all_sprites.add(self.enemy_player)
+        
+        if self.my_player.life == 0 or self.enemy_player.life == 0:
+            self.moscou_song.stop()
+            self.state = END_STATE
 
+    def show_info(self):
+        my_hp_obj = pygame.font.SysFont(self.font, 50, True)
+        my_hp_text = my_hp_obj.render(f"MY LIVES: {self.my_player.life}", 1, INFO_COLORS[game.map - 1])
+        
+        enemy_hp_obj = pygame.font.SysFont(self.font, 50, True)
+        enemy_hp_text = enemy_hp_obj.render(f"ENEMY LIVES: {self.enemy_player.life}", 1, INFO_COLORS[game.map - 1])
+        
+        self.screen.blit(my_hp_text, (450,10))
+        self.screen.blit(enemy_hp_text, (450,70))
+        
 if __name__ == "__main__":
     test_mode = "False"
     file, server_ip, server_port, test_mode = sys.argv

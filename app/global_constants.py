@@ -22,6 +22,7 @@ RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
 COLORS = [RED, BLACK]
+INFO_COLORS = [BLACK, WHITE]
 
 #Images
 TEST_TANK_SHEET = "tank_01_grey.png"
@@ -30,11 +31,12 @@ START_LOGO = "atari_combat_logo.png"
 TANK_WALLPAPER = "tankwallpaper.png"
 START_BACKGROUND = "background.jpg"
 POINTER = "pointer_image.png"
-
+CHOICEMAP = "mapchoice.png"
 #Audios
 AOT_OPENING = 'aotopening.wav'
 MOSCOU_DEFENDER = 'moscoudefender.wav'
 BEEP_SOUND = 'beep.wav'
+MORPHEUS_AUDIO = "morpheus.wav"
 
 
 #TEXT
