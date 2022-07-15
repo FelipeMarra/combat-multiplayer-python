@@ -51,9 +51,7 @@ def show(game):
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type ==  pygame.MOUSEBUTTONDOWN:
                 game.endsong.stop()
-                pygame.quit()
                 waiting = False
                 game.state = END_STATE
-                os._exit()
 
         pygame.display.update()
