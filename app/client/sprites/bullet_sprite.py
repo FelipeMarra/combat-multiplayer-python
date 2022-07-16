@@ -87,3 +87,13 @@ class Bullet(pg.sprite.Sprite):
                 self.game.network.send_player_data(self.game.network.my_player_data)
             #run explosion animation
             self.game.my_player.explode(bullet=self)
+
+    def add(data, game):
+        b = Bullet(game, data.pos, data.dir, data.dx, data.dy, data.pid)
+
+        if data.pid == game.my_player.pid:
+            game.alliebullets.add(b)
+        else:
+            game.enemybullets.add(b)
+
+        game.all_sprites.add(b)

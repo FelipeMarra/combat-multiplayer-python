@@ -132,6 +132,7 @@ if __name__ == "__main__":
         if(my_player.pid == 1):
             game.state = GET_MAP_STATE
             game.network.start_receive(game)
+
             await_screen.show(game)
 
         game.new_game()
