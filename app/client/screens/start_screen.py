@@ -50,5 +50,5 @@ def show(game):
             if show_text:
                 screen.show_text(game, 'PRESS ANY KEY TO CONNECT', 32, YELLOW, WIDTH / 2, HEIGHT / 2 + 50)
 
-            screen.show_text(game, 'Developed by Marra & Galli & Furi', 19, WHITE, WIDTH / 2, HEIGHT - 20)
+            screen.show_text(game, 'Developed by FUGAMA Studios (Furi & Galli & Marra, O Brabo)', 19, WHITE, WIDTH / 2, HEIGHT - 20)
             pygame.display.flip()
