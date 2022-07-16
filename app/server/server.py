@@ -108,7 +108,7 @@ class Server:
                             if(server_pkt.type == POST_GAME_RESET):
                                 print(f"{pid} SENT A RESET WITH LIFE = {server_pkt.data[1]}")
                                 self.send_all(server_pkt)
-                                #If a player have lost disconect all to reset the game
+                                #If a players have lost disconect all to reset the game
                                 if(server_pkt.data[1] == 0):
                                     break
 

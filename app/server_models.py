@@ -23,7 +23,3 @@ class BulletData():
         self.dx = dx
         self.dy = dy
         self.pid = pid
-
-class GameData():
-    def __init__(self, map):
-        self.map = map

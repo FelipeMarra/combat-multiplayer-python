@@ -117,14 +117,7 @@ class Network():
                             game.enemy_player.update_enemy()
 
                         if type(server_pkt) is BulletData:
-                            b = Bullet(game, server_pkt.pos, server_pkt.dir, server_pkt.dx, server_pkt.dy, server_pkt.pid)
-
-                            if server_pkt.pid == game.my_player.pid:
-                                game.alliebullets.add(b)
-                            else:
-                                game.enemybullets.add(b)
-
-                            game.all_sprites.add(b)
+                            Bullet.add(data, game)
 
                         if type(server_pkt) is Command:
                             if(server_pkt.type == POST_GAME_RESET):
