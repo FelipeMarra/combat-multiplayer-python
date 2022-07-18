@@ -45,12 +45,10 @@ if __name__ == "__main__":
                 if currentArgument in ("-c", "--client-only"):
                     client_thread = threading.Thread(target=run_client)
                     client_thread.start()
-                    break
 
                 elif currentArgument in ("-s", "--server-only"):
                     server_thread = threading.Thread(target=run_server)
                     server_thread.start()
-                    break
 
     except getopt.error as err:
         # output error, and return with an error code
