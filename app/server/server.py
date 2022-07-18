@@ -113,8 +113,8 @@ class Server:
                                     break
 
             except BaseException:
-                logging.exception(f"Error listening to client {addr}:")
-                break
+                #logging.exception(f"Error listening to client {addr}:")
+                pass
 
         #If one player goes off, all of them must go off too
         for socket in self.players_sockets:
