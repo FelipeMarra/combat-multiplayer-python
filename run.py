@@ -13,18 +13,21 @@ def run_server():
     subprocess.call(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
 
 
-def run_client():
-    command = f"python -m app.client.client {LOCAL_IP} {SERVER_PORT}"
+def run_client(other_ip = None):
+    if(other_ip):
+        command = f"python -m app.client.client {other_ip} {SERVER_PORT}"
+    else:
+        command = f"python -m app.client.client {LOCAL_IP} {SERVER_PORT}"
     subprocess.call(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
 
 if __name__ == "__main__":
     argumentList = sys.argv[1:]
 
     # Options
-    options = "cs"
+    options = "c:s"
 
     # Long options
-    long_options = ["client-only", "server-only"]
+    long_options = ["client-only=", "server-only"]
 
     try:
         # Parsing argument
@@ -43,8 +46,13 @@ if __name__ == "__main__":
             for currentArgument, currentValue in arguments:
 
                 if currentArgument in ("-c", "--client-only"):
-                    client_thread = threading.Thread(target=run_client)
-                    client_thread.start()
+                    print(f"ARGUMENTO: {currentValue}")
+                    if(currentValue):
+                        client_thread = threading.Thread(target=run_client, args=(currentValue,))
+                        client_thread.start()
+                    else:
+                        client_thread = threading.Thread(target=run_client)
+                        client_thread.start()
 
                 elif currentArgument in ("-s", "--server-only"):
                     server_thread = threading.Thread(target=run_server)
