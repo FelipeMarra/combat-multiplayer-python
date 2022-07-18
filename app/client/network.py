@@ -55,9 +55,10 @@ class Network():
         self.send_w_pickle(Command(POST_GAME_MAP, selected_map))
         print(f"FOI POSTADO O MAPA {selected_map}")
 
-    def send_game_reset(self):
+    def send_game_reset(self, new_life):
+        print(f"MANDANDO RESET PID {self.my_player_data.pid} LIFE {new_life}")
         self.send_w_pickle(Command(POST_GAME_RESET,
-                            (self.my_player_data.pid, self.my_player_data.life)))
+                            (self.my_player_data.pid, new_life)))
 
     def send_bullet_data(self, bullet_data):
         self.send_w_pickle(bullet_data)
@@ -121,9 +122,14 @@ class Network():
 
                         if type(server_pkt) is Command:
                             if(server_pkt.type == POST_GAME_RESET):
-                                if(server_pkt.data[0] != self.my_player_data.pid):
+                                if(server_pkt.data[0] == self.my_player_data.pid):
+                                    self.my_player_data.life = server_pkt.data[1]
+                                    game.my_player.life = server_pkt.data[1]
+                                    print(f"RECEIVED NEW MY LIFE = {game.enemy_player.life}")
+                                else:
                                     self.enemy_player_data.life = server_pkt.data[1]
                                     game.enemy_player.life = server_pkt.data[1]
+                                    print(f"RECEIVED NEW ENEMY LIFE = {game.enemy_player.life}")
                                 game.reset()
 
                 except BaseException:

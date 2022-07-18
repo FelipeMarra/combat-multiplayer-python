@@ -80,11 +80,6 @@ class Bullet(pg.sprite.Sprite):
             self.game.enemy_player.explode(bullet=self)
 
         if pg.sprite.spritecollide(self.game.my_player, self.game.enemybullets, False):
-            #decrement player life
-            if self.game.my_player.life >  0:
-                self.game.my_player.life = self.game.my_player.life - 1
-                self.game.network.my_player_data.life = self.game.my_player.life
-                self.game.network.send_player_data(self.game.network.my_player_data)
             #run explosion animation
             self.game.my_player.explode(bullet=self)
 

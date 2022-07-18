@@ -41,4 +41,5 @@ class Explosion(pg.sprite.Sprite):
             self.kill()
             #send to all players that they have to reset positions
             if self.pid == self.game.my_player.pid:
-                self.game.network.send_game_reset()
+                new_life = self.game.my_player.life - 1
+                self.game.network.send_game_reset(new_life)
